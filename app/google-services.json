@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308394830065",
+    "project_id": "beautiful-login-90193",
+    "storage_bucket": "beautiful-login-90193.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308394830065:android:0ffa2a949669ba54976150",
+        "android_client_info": {
+          "package_name": "com.endcodev.beautifullogin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChmMrs9f5uFqtljFx0Fl_7mGiFjhoijw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
