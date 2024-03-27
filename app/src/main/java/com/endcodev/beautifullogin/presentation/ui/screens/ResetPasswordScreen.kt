@@ -70,7 +70,6 @@ fun ResetPasswordContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LogoText()
-        Spacer(modifier = Modifier.height(10.dp))
         EmailTextField(email = email, error = null, onTextChanged = onEmailChanged)
         RectangleButton(text = "RESET PASSWORD", loginEnabled = isLoginEnabled, onAuthClick)
     }

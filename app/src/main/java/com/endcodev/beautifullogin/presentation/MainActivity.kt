@@ -13,7 +13,6 @@ import androidx.media3.common.util.UnstableApi
 import com.endcodev.beautifullogin.navigation.RootNavGraph
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
-
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(UnstableApi::class)

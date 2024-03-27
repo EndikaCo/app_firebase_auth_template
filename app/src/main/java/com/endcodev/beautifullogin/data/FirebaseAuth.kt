@@ -1,5 +1,6 @@
 package com.endcodev.beautifullogin.data
 
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.koin.core.component.KoinComponent
@@ -12,6 +13,7 @@ sealed class AuthMessage(val error: Int) {
     data object ErrorMailOrPass : AuthMessage(error = 103)
     data object ErrorSendingMail : AuthMessage(error = 104) // Unable to send verification email
     data object ErrorCreatingAccount : AuthMessage(error = 105) // Unable to send verification email
+    data object ErrorMailInUse : AuthMessage(error = 106) // Email already in use
 }
 
 @Singleton
@@ -21,8 +23,8 @@ class FirebaseAuth : KoinComponent {
     fun createUser(email: String, pass: String, onCreateUserError: (Int) -> Unit) {
         val auth = firebase.auth
 
-        auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { it ->
-            if (it.isSuccessful) {
+        auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { result ->
+            if (result.isSuccessful) {
                 sendMailVerification {
                     if (it == AuthMessage.OK.error) {
                         onCreateUserError(AuthMessage.OK.error)
@@ -30,10 +32,12 @@ class FirebaseAuth : KoinComponent {
                         onCreateUserError(AuthMessage.ErrorSendingMail.error)
                     }
                 }
-            } else if (it.isCanceled) {
-                onCreateUserError(AuthMessage.ErrorCreatingAccount.error)
             } else {
-                onCreateUserError(AuthMessage.ErrorCreatingAccount.error)
+                if (result.exception is FirebaseAuthUserCollisionException) {
+                    onCreateUserError(AuthMessage.ErrorMailInUse.error)
+                } else {
+                    onCreateUserError(AuthMessage.ErrorCreatingAccount.error)
+                }
             }
         }
     }

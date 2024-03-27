@@ -71,7 +71,6 @@ fun SignUpContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LogoText()
-        Spacer(modifier = Modifier.height(10.dp))
         EmailTextField(
             email = uiState.email,
             error = uiState.emailError,

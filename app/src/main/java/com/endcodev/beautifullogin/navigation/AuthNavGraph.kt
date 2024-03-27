@@ -1,11 +1,14 @@
 package com.endcodev.beautifullogin.navigation
 
+import android.app.AlertDialog
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -15,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.endcodev.beautifullogin.data.AuthMessage
+import com.endcodev.beautifullogin.domain.DialogErrorUiState
 import com.endcodev.beautifullogin.presentation.AuthViewModel
 import com.endcodev.beautifullogin.presentation.ui.screens.LoginScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.ResetPasswordScreen
@@ -31,15 +35,23 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
         composable(route = AuthGraph.LOGIN.route) {
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
-            val uiState by viewModel.state.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
+            val context = LocalContext.current
 
             LoginScreen(
                 uiState = uiState,
                 onAuthClick = {
-                    viewModel.mailPassLogin(onResult = { result ->
-                        if (result == AuthMessage.OK.error) {
+                    viewModel.mailPassLogin(onResult = { error ->
+                        if (error == AuthMessage.OK.error) {
                             navController.popBackStack() // clear nav history
                             navController.navigate(RootGraph.HOME)
+                        } else {
+                            val err = getError(error)
+                            showDialog(
+                                context,
+                                err.title,
+                                err.message
+                            )
                         }
                     })
                 },
@@ -53,13 +65,23 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
         composable(route = AuthGraph.SIGNUP.route) {
 
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
-            val uiState by viewModel.state.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
+            val context = LocalContext.current
 
             SignUpScreen(
                 uiState,
                 onAuthButtonClick = {
                     viewModel.createUser { error ->
-                        if (error == AuthMessage.OK.error) navController.navigate(AuthGraph.WAITING.route)
+                        if (error == AuthMessage.OK.error)
+                            navController.navigate(AuthGraph.WAITING.route)
+                        else {
+                            val err = getError(error)
+                            showDialog(
+                                context,
+                                err.title,
+                                err.message
+                            )
+                        }
                     }
                 },
                 onLogInClick = { navController.navigate(RootGraph.AUTH) },
@@ -73,7 +95,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
         composable(route = AuthGraph.RESET.route) {
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
-            val uiState by viewModel.state.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
 
             ResetPasswordScreen(
                 email = uiState.email,
@@ -87,11 +109,36 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
         composable(route = AuthGraph.WAITING.route) {
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
-            val uiState by viewModel.state.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
             viewModel.listenerMailVerification { navController.navigate(RootGraph.AUTH) }
             WaitingScreen(uiState)
         }
     }
+}
+
+fun showDialog(context: Context, title: String, message: String) {
+    val builder = AlertDialog.Builder(context)
+    builder.setTitle(title)
+    builder.setMessage(message)
+    builder.setPositiveButton("OK") { dialog, _ ->
+        dialog.dismiss()
+    }
+    val alertDialog = builder.create()
+    alertDialog.show()
+}
+
+fun getError(errorNum: Int): DialogErrorUiState {
+
+    val title = "Error $errorNum"
+    val description : String = when (errorNum) {
+        AuthMessage.MailVerificationError.error -> "Mail Verification Error"
+        AuthMessage.ErrorMailOrPass.error -> "Error Mail Or Pass"
+        AuthMessage.ErrorSendingMail.error -> "Error Sending Mail"
+        AuthMessage.ErrorCreatingAccount.error -> "Error Creating Account"
+        AuthMessage.ErrorMailInUse.error -> "Error Mail already in use"
+        else -> { "Undefined Error" }
+    }
+    return DialogErrorUiState(true, title, description, "Ok")
 }
 
 sealed class AuthGraph(val route: String) {
