@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.AuthUiState
-import com.endcodev.beautifullogin.domain.DialogErrorUiState
 import com.endcodev.beautifullogin.presentation.ui.components.AuthLinks
 import com.endcodev.beautifullogin.presentation.ui.components.EmailTextField
 import com.endcodev.beautifullogin.presentation.ui.components.GoogleLoginButton
@@ -35,10 +34,11 @@ fun LoginScreen(
     onResetClick: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onPassChanged: (String) -> Unit,
+    onGoogleClick: () -> Unit
 ) {
     Scaffold(
         topBar = { TopGradient() },
-        content = { pad -> LoginContent(pad, uiState, onAuthClick, onEmailChanged, onPassChanged) },
+        content = { pad -> LoginContent(pad, uiState, onAuthClick, onEmailChanged, onPassChanged, onGoogleClick) },
         bottomBar = {
             AuthLinks(
                 link1Text = "Reset password",
@@ -57,7 +57,8 @@ fun LoginContent(
     uiState: AuthUiState,
     onLoginClick: () -> Unit,
     onEmailChanged: (String) -> Unit,
-    onPassChanged: (String) -> Unit
+    onPassChanged: (String) -> Unit,
+    onGoogleClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -81,7 +82,7 @@ fun LoginContent(
         )
         RectangleButton(text = "LOG IN", loginEnabled = uiState.isAuthButtonEnabled, onLoginClick)
         Spacer(modifier = Modifier.height(16.dp))
-        GoogleLoginButton()
+        GoogleLoginButton(onGoogleClick)
     }
 }
 
@@ -100,6 +101,7 @@ fun LoginScreenPreview() {
             onResetClick = {},
             onEmailChanged = {},
             onPassChanged = {},
+            onGoogleClick = {}
         )
     }
 }

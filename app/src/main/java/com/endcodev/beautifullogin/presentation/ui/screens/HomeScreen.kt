@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -23,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.endcodev.beautifullogin.domain.HomeUiState
-
+import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,19 +39,19 @@ fun HomeScreen(state: HomeUiState, onProfileClick: () -> Unit) {
         topBar = {
             TopAppBar(
                 title = { },
-                actions = { TopBarActions(onProfileClick) },
+                actions = { TopBarActions(onProfileClick, state) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
         },
         bottomBar = {},
-        content = { innerPadding -> HomeContent(innerPadding, state) }
+        content = { innerPadding -> HomeContent(innerPadding) }
     )
 }
 
 @Composable
-fun HomeContent(innerPadding: PaddingValues, state: HomeUiState) {
+fun HomeContent(innerPadding: PaddingValues,) {
     Box(
         modifier = Modifier
             .padding(innerPadding)
@@ -60,20 +64,28 @@ fun HomeContent(innerPadding: PaddingValues, state: HomeUiState) {
 }
 
 @Composable
-fun TopBarActions(onClick : () -> Unit) {
+fun TopBarActions(onClick: () -> Unit, state: HomeUiState) {
     Row(
-        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(end = 10.dp) //padding to the end
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.onSurface)
-            .padding(2.dp).clickable { onClick() }
-    ) {
-        OpenAccount()
+        horizontalArrangement = Arrangement.End,
+        ) {
+        Text(
+            text = "${state.auth?.currentUser?.email}\n${state.auth?.currentUser?.displayName}",
+            textAlign = TextAlign.End
+        )
+        Spacer(modifier = Modifier.width(10.dp)) // Espacio entre el texto y el ícono
+        Box(
+            modifier = Modifier
+                .padding(end = 10.dp) //padding to the end
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.onSurface)
+                .padding(2.dp)
+                .clickable { onClick() }
+        ) {
+            OpenAccount()
+        }
     }
 }
-
 
 @Composable
 fun OpenAccount() {
@@ -85,7 +97,16 @@ fun OpenAccount() {
         Icon(
             Icons.Default.Person,
             contentDescription = "Login Icon",
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(40.dp),
+            tint = MaterialTheme.colorScheme.surfaceVariant
         )
+    }
+}
+
+@Preview
+@Composable
+fun HomePreview() {
+    BeautifulLoginTheme {
+        HomeScreen(HomeUiState(), {})
     }
 }

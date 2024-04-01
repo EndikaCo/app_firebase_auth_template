@@ -1,14 +1,27 @@
 package com.endcodev.beautifullogin.presentation
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.util.Patterns
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
+import com.endcodev.beautifullogin.domain.App
 import com.endcodev.beautifullogin.domain.AuthUiState
 import com.endcodev.beautifullogin.domain.DialogErrorUiState
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,8 +41,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
     private val client: FirebaseClient by inject()
 
     private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState =
-        _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _uiState.value)
+    val uiState = _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _uiState.value)
 
     private val _dialogState = MutableStateFlow(DialogErrorUiState())
     val dialogState = _dialogState.asStateFlow()
@@ -37,11 +49,65 @@ class AuthViewModel : ViewModel(), KoinComponent {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
-    fun checkLoginState() {
-        //client.auth.currentUser?.reload()
+    init {
+        enableLogin(uiState.value.email, uiState.value.password)
+        updateLoginState()
+    }
+
+    private fun updateLoginState() {
         val mClient = client.auth.currentUser
-        if (mClient?.isEmailVerified == true)
-            _isLoggedIn.value = true
+        _isLoggedIn.value = mClient?.isEmailVerified == true
+    }
+
+    fun disconnectUser() {
+        auth.disconnectUser()
+    }
+
+    fun gLoginInit(result: ActivityResult?) {
+
+        if (result != null) {
+
+            if (result.resultCode == Activity.RESULT_OK) {
+
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    if (account != null)
+                        gLogin(account)
+                } catch (e: ApiException) {
+                    Log.e(App.tag, "gLoginInit: error", )
+                }
+            }
+        }
+        //binding.progress.visibility = View.GONE
+    }
+
+    private fun gLogin(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.v(App.tag, "gLogin: Login success", )
+                } else {
+                    Log.v(App.tag, "gLogin: Login fail", )
+                }
+            }
+    }
+
+    fun googleLogin(
+        context: Context,
+        launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    ) {
+        val googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        val googleClient = GoogleSignIn.getClient(context, googleConf)
+        val signInIntent = Intent(googleClient.signInIntent)
+        launcher.launch(signInIntent)
     }
 
     fun showDialog(title: String, message: String, positiveButton: String) {
@@ -54,6 +120,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
             )
         }
     }
+
     fun hideDialog() { _dialogState.update { DialogErrorUiState() } }
 
     fun mailPassLogin(onResult: (Int) -> Unit) {

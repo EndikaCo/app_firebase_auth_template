@@ -2,6 +2,7 @@ package com.endcodev.beautifullogin.presentation.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.imePadding
@@ -20,7 +21,7 @@ import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 import com.google.firebase.database.ktx.R
 
 @Composable
-fun GoogleLoginButton() {
+fun GoogleLoginButton(onGoogleClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .imePadding()
@@ -31,7 +32,8 @@ fun GoogleLoginButton() {
                     radius = Float.POSITIVE_INFINITY
                 ),
             )
-            .padding(start = 8.dp, end = 8.dp),
+            .padding(start = 8.dp, end = 8.dp)
+            .clickable { onGoogleClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {

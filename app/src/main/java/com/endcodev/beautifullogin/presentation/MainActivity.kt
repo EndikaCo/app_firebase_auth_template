@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.media3.common.util.UnstableApi
-import com.endcodev.beautifullogin.navigation.RootNavGraph
+import com.endcodev.beautifullogin.presentation.navigation.RootNavGraph
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 class MainActivity : ComponentActivity() {

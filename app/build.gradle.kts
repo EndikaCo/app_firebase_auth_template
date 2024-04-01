@@ -73,8 +73,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Koin
-    implementation("io.insert-koin:koin-android:3.5.3")
-
+    implementation(libs.koin.android)
 
     // firebase
     implementation("com.google.firebase:firebase-database:20.3.1")
@@ -98,4 +97,10 @@ dependencies {
 
     //extended icons
     implementation("androidx.compose.material:material-icons-extended:1.6.3")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
+
+    // login with google button
+    implementation(libs.play.services.auth)
 }

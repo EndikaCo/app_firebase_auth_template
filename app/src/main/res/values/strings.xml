@@ -11,4 +11,5 @@
     <string name="repeat_pass">Repeat password</string>
     <string name="enter_username">Enter username</string>
     <string name="google_login">Google login</string>
+    <string name="default_web_client_id">308394830065-r8gb6ctsa5m1otdtkhqvtvkchpcn6gsq.apps.googleusercontent.com</string>
 </resources>

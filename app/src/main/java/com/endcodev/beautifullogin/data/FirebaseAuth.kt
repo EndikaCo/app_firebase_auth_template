@@ -66,4 +66,8 @@ class FirebaseAuth : KoinComponent {
                 }
             }
     }
+
+    fun disconnectUser() {
+        Firebase.auth.signOut()
+    }
 }

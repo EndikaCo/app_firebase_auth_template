@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.navigation
+package com.endcodev.beautifullogin.presentation.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -29,17 +29,24 @@ fun RootNavGraph() {
     val player = initPlayer(context)
     val loggedIn = remember { mutableStateOf(false) }
 
-    if (!loggedIn.value)
+    if (!loggedIn.value) {
         MovingBackground(player)
+        player.prepare()
+    }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         if (!player.isPlaying) {
-            player.prepare()
             player.play()
         }
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        if (player.isPlaying) {
+            player.stop()
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
         if (player.isPlaying) {
             player.stop()
         }
@@ -66,7 +73,10 @@ fun RootNavGraph() {
             composable(route = HomeGraph.PROFILE.route) {
                 val viewModel: HomeViewModel = viewModel()
                 val uiState by viewModel.state.collectAsState()
-                ProfileScreen(uiState, onClick = {})
+                ProfileScreen(
+                    uiState,
+                    onLogOutClick = { viewModel.disconnectUser() },
+                    onDeleteClick = {})
             }
         }
     }
