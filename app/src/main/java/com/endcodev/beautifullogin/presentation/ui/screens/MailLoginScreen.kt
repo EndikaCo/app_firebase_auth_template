@@ -19,7 +19,6 @@ import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.AuthUiState
 import com.endcodev.beautifullogin.presentation.ui.components.AuthLinks
 import com.endcodev.beautifullogin.presentation.ui.components.EmailTextField
-import com.endcodev.beautifullogin.presentation.ui.components.GoogleLoginButton
 import com.endcodev.beautifullogin.presentation.ui.components.LogoText
 import com.endcodev.beautifullogin.presentation.ui.components.PasswordTextField
 import com.endcodev.beautifullogin.presentation.ui.components.RectangleButton
@@ -27,7 +26,7 @@ import com.endcodev.beautifullogin.presentation.ui.components.TopGradient
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @Composable
-fun LoginScreen(
+fun MailLoginScreen(
     uiState: AuthUiState,
     onAuthClick: () -> Unit,
     onSignUpClick: () -> Unit,
@@ -82,15 +81,14 @@ fun LoginContent(
         )
         RectangleButton(text = "LOG IN", loginEnabled = uiState.isAuthButtonEnabled, onLoginClick)
         Spacer(modifier = Modifier.height(16.dp))
-        GoogleLoginButton(onGoogleClick)
     }
 }
 
-@Preview (showBackground = true)
+@Preview (showBackground = true, backgroundColor = 0xFF2D4A64)
 @Composable
 fun LoginScreenPreview() {
     BeautifulLoginTheme {
-        LoginScreen(
+        MailLoginScreen(
             AuthUiState(
                 email = "email",
                 password = "password",
