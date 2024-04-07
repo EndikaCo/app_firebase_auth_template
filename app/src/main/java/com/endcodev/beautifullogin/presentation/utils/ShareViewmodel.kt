@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.presentation.navigation
+package com.endcodev.beautifullogin.presentation.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-
 
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {

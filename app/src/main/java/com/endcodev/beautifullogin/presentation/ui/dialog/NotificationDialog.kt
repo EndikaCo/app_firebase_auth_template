@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.presentation
+package com.endcodev.beautifullogin.presentation.ui.dialog
 
 
 import androidx.compose.material3.AlertDialog

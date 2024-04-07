@@ -1,8 +1,8 @@
 package com.endcodev.beautifullogin.domain
 
 data class AuthUiState(
-    val email: String = "endikacorreia@gmail.com", //todo
-    val password: String = "qwertyuiop",
+    val email: String = "",
+    val password: String = "",
     val userName: String = "",
     val isAuthButtonEnabled: Boolean = false,
     val isLoading: Boolean = false,

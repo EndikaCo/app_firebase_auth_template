@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,12 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.endcodev.beautifullogin.R
-import com.endcodev.beautifullogin.domain.AuthUiState
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @Composable
 fun SocialLogin(
-    state: AuthUiState,
     onGoogleClick: () -> Unit,
     onGithubClick: () -> Unit,
     onMailClick: () -> Unit,
@@ -64,10 +64,13 @@ fun AuthContent(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = "Welcome to Beautiful Login", fontSize = 20.sp)
+        Text(text = "Welcome to Beautiful Login", fontSize = 18.sp, color = Color.Black)
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(onClick = { onGoogleClick() }) {
+        Button(
+            onClick = { onGoogleClick() },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -75,13 +78,17 @@ fun AuthContent(
             ) {
                 Icon(
                     painter = painterResource(id = com.google.firebase.database.collection.R.drawable.googleg_standard_color_18),
-                    contentDescription = "User Account"
+                    contentDescription = "User Account",
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "Continue with Google")
+                Text(text = "Continue with Google", color = MaterialTheme.colorScheme.onSecondaryContainer)
             }
         }
-        Button(onClick = { onGithubClick() }) {
+        Button(
+            onClick = { onGithubClick() },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -89,11 +96,12 @@ fun AuthContent(
 
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.github),
+                    painter = painterResource(id = R.drawable.link_24),
                     contentDescription = "User Account",
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "Continue with Github")
+                Text(text = "Continue with Github", color = MaterialTheme.colorScheme.onSecondaryContainer)
             }
         }
         Button(onClick = { onMailClick() }) {
@@ -116,6 +124,6 @@ fun AuthContent(
 @Composable
 fun AuthScreenPreview() {
     BeautifulLoginTheme {
-        SocialLogin(AuthUiState(), {}, {}, {})
+        SocialLogin({}, {}, {})
     }
 }

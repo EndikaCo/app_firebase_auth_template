@@ -1,6 +1,8 @@
 package com.endcodev.beautifullogin
 
 import android.app.Application
+import com.endcodev.beautifullogin.di.appModule
+import com.endcodev.beautifullogin.di.authModule
 
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

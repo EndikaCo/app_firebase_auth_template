@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.presentation
+package com.endcodev.beautifullogin.presentation.viewmodel
 
 import android.app.Activity
 import android.content.Context
@@ -93,6 +93,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 } else {
                     Log.v(App.tag, "gLogin: Login fail", )
                 }
+                updateLoginState()
             }
     }
 
@@ -126,6 +127,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
     fun mailPassLogin(onResult: (Int) -> Unit) {
         auth.mailPassLogin(uiState.value.email, uiState.value.password) { error ->
             onResult(error)
+            updateLoginState() //todo
         }
     }
 

@@ -1,8 +1,8 @@
-package com.endcodev.beautifullogin
+package com.endcodev.beautifullogin.di
 
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
-import com.endcodev.beautifullogin.presentation.AuthViewModel
+import com.endcodev.beautifullogin.presentation.viewmodel.AuthViewModel
 import org.koin.dsl.module
 
 val authModule = module {

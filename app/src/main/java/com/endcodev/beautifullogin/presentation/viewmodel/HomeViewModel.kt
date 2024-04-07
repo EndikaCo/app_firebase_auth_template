@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.presentation
+package com.endcodev.beautifullogin.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.endcodev.beautifullogin.data.FirebaseAuth
