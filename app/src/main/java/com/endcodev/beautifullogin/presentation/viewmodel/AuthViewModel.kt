@@ -59,10 +59,6 @@ class AuthViewModel : ViewModel(), KoinComponent {
         _isLoggedIn.value = mClient?.isEmailVerified == true
     }
 
-    fun disconnectUser() {
-        auth.disconnectUser()
-    }
-
     fun gLoginInit(result: ActivityResult?) {
 
         if (result != null) {

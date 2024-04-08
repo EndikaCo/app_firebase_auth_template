@@ -1,7 +1,9 @@
 package com.endcodev.beautifullogin.presentation.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.endcodev.beautifullogin.R
+import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @Composable
 fun EmailTextField(email: String, error: String?, onTextChanged: (String) -> Unit) {
@@ -35,15 +38,15 @@ fun EmailTextField(email: String, error: String?, onTextChanged: (String) -> Uni
                 stringResource(R.string.enter_mail),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 31.dp), textAlign = TextAlign.Center
+                    .padding(end = 31.dp)
+                ,textAlign = TextAlign.Center
             )
         },
-        maxLines = 1,
         leadingIcon = {
             Icon(
                 Icons.Default.Email,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         },
         singleLine = true,
@@ -64,5 +67,10 @@ fun EmailTextField(email: String, error: String?, onTextChanged: (String) -> Uni
 @Preview
 @Composable
 fun EmailTextFieldPreview() {
-    EmailTextField(email = stringResource(R.string.enter_mail), error = "error", onTextChanged = {})
+    BeautifulLoginTheme {
+        EmailTextField(
+            email = stringResource(R.string.enter_mail),
+            error = "error",
+            onTextChanged = {})
+    }
 }
