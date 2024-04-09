@@ -14,15 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.endcodev.beautifullogin.R
+import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @Composable
 fun RectangleButton(text: String, loginEnabled: Boolean, onLoginClick: () -> Unit) {
 
     val backgroundColor = MaterialTheme.colorScheme.primary
-    val transparentBackgroundColor = backgroundColor.copy(alpha = 0.7f)
+    val transparentBackgroundColor = backgroundColor.copy(alpha = 0.9f)
     Button(
         onClick = { onLoginClick() },
         enabled = loginEnabled,
@@ -43,5 +45,13 @@ fun RectangleButton(text: String, loginEnabled: Boolean, onLoginClick: () -> Uni
             color = MaterialTheme.colorScheme.surfaceVariant,
             fontFamily = FontFamily(Font(R.font.chakrapetchbold))
         )
+    }
+}
+
+@Preview
+@Composable
+fun RectangleButtonPreview() {
+    BeautifulLoginTheme {
+        RectangleButton(text = "LOG IN", loginEnabled = true, onLoginClick = {})
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.AuthUiState
 import com.endcodev.beautifullogin.presentation.ui.components.EmailTextField
+import com.endcodev.beautifullogin.presentation.ui.components.LinkedText
 import com.endcodev.beautifullogin.presentation.ui.components.LoginLink
 import com.endcodev.beautifullogin.presentation.ui.components.LogoText
 import com.endcodev.beautifullogin.presentation.ui.components.PasswordTextField
@@ -35,6 +36,7 @@ fun SignUpScreen(
     onEmailChanged: (String) -> Unit,
     onPassChanged: (String) -> Unit,
     onUserNameChanged: (String) -> Unit,
+    onCheckedTerms: (Boolean) -> Unit,
 ) {
     Scaffold(
         topBar = { TopGradient() },
@@ -45,7 +47,8 @@ fun SignUpScreen(
                 onAuthButtonClick,
                 onEmailChanged,
                 onPassChanged,
-                onUserNameChanged
+                onUserNameChanged,
+                onCheckedTerms
             )
         },
         bottomBar = { LoginLink(onLogInClick) },
@@ -60,7 +63,8 @@ fun SignUpContent(
     onAuthButtonClick: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onPassChanged: (String) -> Unit,
-    onUserNameChanged: (String) -> Unit
+    onUserNameChanged: (String) -> Unit,
+    onCheckedTerms: (Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -87,6 +91,8 @@ fun SignUpContent(
             error = uiState.passwordError,
             onTextChanged = onPassChanged
         )
+        LinkedText(onCheckedTerms, uiState.isTermsChecked)
+        Spacer(modifier = Modifier.height(16.dp))
         RectangleButton(
             text = "SIGN UP",
             loginEnabled = uiState.isAuthButtonEnabled,
@@ -109,7 +115,8 @@ fun SignUpScreenPreview() {
             onLogInClick = {},
             onEmailChanged = {},
             onPassChanged = {},
-            onUserNameChanged = {}
+            onUserNameChanged = {},
+            onCheckedTerms = {}
         )
     }
 }

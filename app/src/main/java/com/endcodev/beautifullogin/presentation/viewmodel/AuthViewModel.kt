@@ -41,7 +41,8 @@ class AuthViewModel : ViewModel(), KoinComponent {
     private val client: FirebaseClient by inject()
 
     private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState = _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _uiState.value)
+    val uiState =
+        _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _uiState.value)
 
     private val _dialogState = MutableStateFlow(DialogErrorUiState())
     val dialogState = _dialogState.asStateFlow()
@@ -72,7 +73,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
                     if (account != null)
                         gLogin(account)
                 } catch (e: ApiException) {
-                    Log.e(App.tag, "gLoginInit: error", )
+                    Log.e(App.tag, "gLoginInit: error")
                 }
             }
         }
@@ -85,9 +86,9 @@ class AuthViewModel : ViewModel(), KoinComponent {
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.v(App.tag, "gLogin: Login success", )
+                    Log.v(App.tag, "gLogin: Login success")
                 } else {
-                    Log.v(App.tag, "gLogin: Login fail", )
+                    Log.v(App.tag, "gLogin: Login fail")
                 }
                 updateLoginState()
             }
@@ -118,7 +119,9 @@ class AuthViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun hideDialog() { _dialogState.update { DialogErrorUiState() } }
+    fun hideDialog() {
+        _dialogState.update { DialogErrorUiState() }
+    }
 
     fun mailPassLogin(onResult: (Int) -> Unit) {
         auth.mailPassLogin(uiState.value.email, uiState.value.password) { error ->
@@ -128,7 +131,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
     }
 
     fun createUser(error: (Int) -> Unit) {
-        auth.createUser(uiState.value.email, uiState.value.password) {error(it) }
+        auth.createUser(uiState.value.email, uiState.value.password) { error(it) }
     }
 
     fun updateReset(email: String) {
@@ -153,7 +156,8 @@ class AuthViewModel : ViewModel(), KoinComponent {
     fun updateSignUp(
         email: String? = null,
         pass: String? = null,
-        userName: String? = null
+        userName: String? = null,
+        terms: Boolean? = null
     ) {
         val mEmail = email ?: uiState.value.email
         val mEmailError =
@@ -164,6 +168,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
         val mUserName = userName ?: uiState.value.userName
         val mUserNameError =
             if (mUserName.isBlank()) null else if (isNameValid(mUserName)) null else "Name < 3 character"
+        val mTerms = terms ?: uiState.value.isTermsChecked
 
         _uiState.update {
             it.copy(
@@ -171,10 +176,10 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 emailError = mEmailError,
                 password = mPass,
                 passwordError = mPassError,
-
                 userName = mUserName,
                 userNameError = mUserNameError,
-                isAuthButtonEnabled = enableSignUp(mEmail, mPass, mUserName)
+                isAuthButtonEnabled = enableSignUp(mEmail, mPass, mUserName, mTerms),
+                isTermsChecked = mTerms
             )
         }
     }
@@ -201,9 +206,11 @@ class AuthViewModel : ViewModel(), KoinComponent {
         email: String,
         password: String,
         userName: String,
+        terms: Boolean
     ): Boolean = isMailValid(email)
             && isPassValid(password)
             && isNameValid(userName)
+            && terms
 
     private fun enableLogin(email: String, password: String) =
         isMailValid(email) && isPassValid(password)

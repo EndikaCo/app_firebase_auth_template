@@ -8,5 +8,7 @@ data class AuthUiState(
     val isLoading: Boolean = false,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val userNameError: String? = null
-)
+    val userNameError: String? = null,
+    val isTermsChecked: Boolean = false
+) {
+}

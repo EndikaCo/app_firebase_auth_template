@@ -1,7 +1,5 @@
 package com.endcodev.beautifullogin.presentation.navigation
 
-import android.app.AlertDialog
-import android.content.Context
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,48 +12,22 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.endcodev.beautifullogin.data.AuthMessage
-import com.endcodev.beautifullogin.domain.DialogErrorUiState
-import com.endcodev.beautifullogin.presentation.viewmodel.AuthViewModel
 import com.endcodev.beautifullogin.presentation.ui.screens.MailLoginScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.ResetPasswordScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.SignUpScreen
-import com.endcodev.beautifullogin.presentation.ui.screens.SocialLogin
 import com.endcodev.beautifullogin.presentation.ui.screens.WaitingScreen
 import com.endcodev.beautifullogin.presentation.utils.getError
 import com.endcodev.beautifullogin.presentation.utils.sharedViewModel
 import com.endcodev.beautifullogin.presentation.utils.showDialog
+import com.endcodev.beautifullogin.presentation.viewmodel.AuthViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
     navigation(
         route = RootGraph.AUTH,
-        startDestination = AuthGraph.SOCIAL.route
+        startDestination = AuthGraph.LOGIN.route
     ) {
-
-        composable(route = AuthGraph.SOCIAL.route) {
-            val context = LocalContext.current
-            val viewModel = it.sharedViewModel<AuthViewModel>(navController)
-            val uiState by viewModel.uiState.collectAsState()
-            val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-            if (isLoggedIn) {
-                navController.popBackStack() // clear nav history
-                navController.navigate(RootGraph.HOME) {
-                }
-            }
-
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult(),
-                onResult = { result -> viewModel.gLoginInit(result) }
-            )
-
-            SocialLogin(
-                onGoogleClick = { viewModel.googleLogin(context, launcher) },
-                onGithubClick = {},
-                onMailClick = { navController.navigate(AuthGraph.LOGIN.route) }
-            )
-
-        }
 
         composable(route = AuthGraph.LOGIN.route) { it ->
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
@@ -65,6 +37,11 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 navController.popBackStack() // clear nav history
                 navController.navigate(RootGraph.HOME)
             }
+
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = { result -> viewModel.gLoginInit(result) }
+            )
             val context = LocalContext.current
 
             MailLoginScreen(
@@ -85,7 +62,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 onResetClick = { navController.navigate(AuthGraph.RESET.route) },
                 onEmailChanged = { email -> viewModel.updateLogin(email, uiState.password) },
                 onPassChanged = { pass -> viewModel.updateLogin(uiState.email, pass) },
-                onGoogleClick = { }
+                onGoogleClick = { viewModel.googleLogin(context, launcher) }
             )
         }
 
@@ -114,9 +91,8 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 onLogInClick = { navController.navigate(RootGraph.AUTH) },
                 onEmailChanged = { email -> viewModel.updateSignUp(email = email) },
                 onPassChanged = { password -> viewModel.updateSignUp(pass = password) },
-                onUserNameChanged = { userName ->
-                    viewModel.updateSignUp(userName = userName)
-                }
+                onUserNameChanged = { userName -> viewModel.updateSignUp(userName = userName) },
+                onCheckedTerms = { terms -> viewModel.updateSignUp(terms = terms) }
             )
         }
 
@@ -144,7 +120,6 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 }
 
 sealed class AuthGraph(val route: String) {
-    data object SOCIAL : AuthGraph(route = "SOCIAL")
     data object LOGIN : AuthGraph(route = "LOGIN")
     data object SIGNUP : AuthGraph(route = "SIGN")
     data object RESET : AuthGraph(route = "RESET")

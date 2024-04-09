@@ -1,5 +1,7 @@
 package com.endcodev.beautifullogin.presentation.ui.screens
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.endcodev.beautifullogin.domain.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
@@ -82,19 +85,25 @@ fun TopBarActions(onClick: () -> Unit, state: HomeUiState) {
                 .padding(2.dp)
                 .clickable { onClick() }
         ) {
-            OpenAccount()
+            OpenAccount(state.auth?.currentUser?.photoUrl)
         }
     }
 }
 
 @Composable
-fun OpenAccount() {
+fun OpenAccount(photoUrl: Uri?) {
     Box(
         modifier = Modifier
             .size(40.dp),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
+        photoUrl?.let {
+            Image(
+                painter = rememberImagePainter(data = it),
+                contentDescription = "User Photo",
+                modifier = Modifier.size(40.dp)
+            )
+        } ?: Icon(
             Icons.Default.Person,
             contentDescription = "Login Icon",
             modifier = Modifier.size(40.dp),

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import com.endcodev.beautifullogin.presentation.ui.components.EmailTextField
 import com.endcodev.beautifullogin.presentation.ui.components.LogoText
 import com.endcodev.beautifullogin.presentation.ui.components.PasswordTextField
 import com.endcodev.beautifullogin.presentation.ui.components.RectangleButton
+import com.endcodev.beautifullogin.presentation.ui.components.SocialButton
 import com.endcodev.beautifullogin.presentation.ui.components.TopGradient
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
@@ -37,7 +39,16 @@ fun MailLoginScreen(
 ) {
     Scaffold(
         topBar = { TopGradient() },
-        content = { pad -> LoginContent(pad, uiState, onAuthClick, onEmailChanged, onPassChanged, onGoogleClick) },
+        content = { pad ->
+            LoginContent(
+                pad,
+                uiState,
+                onAuthClick,
+                onEmailChanged,
+                onPassChanged,
+                onGoogleClick
+            )
+        },
         bottomBar = {
             AuthLinks(
                 link1Text = "Reset password",
@@ -59,6 +70,8 @@ fun LoginContent(
     onPassChanged: (String) -> Unit,
     onGoogleClick: () -> Unit
 ) {
+    if(uiState.isLoading)
+        CircularProgressIndicator()
     Column(
         modifier = Modifier
             .padding(pad)
@@ -80,11 +93,12 @@ fun LoginContent(
             onTextChanged = onPassChanged
         )
         RectangleButton(text = "LOG IN", loginEnabled = uiState.isAuthButtonEnabled, onLoginClick)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+        SocialButton(onClick = { onGoogleClick() })
     }
 }
 
-@Preview (showBackground = true, backgroundColor = 0xFF2D4A64)
+@Preview(showBackground = true, backgroundColor = 0xFF2D4A64)
 @Composable
 fun LoginScreenPreview() {
     BeautifulLoginTheme {
