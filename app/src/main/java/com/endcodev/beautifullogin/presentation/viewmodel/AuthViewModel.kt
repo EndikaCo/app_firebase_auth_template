@@ -15,8 +15,8 @@ import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
 import com.endcodev.beautifullogin.domain.App
-import com.endcodev.beautifullogin.domain.AuthUiState
-import com.endcodev.beautifullogin.domain.DialogErrorUiState
+import com.endcodev.beautifullogin.domain.model.AuthUiState
+import com.endcodev.beautifullogin.domain.model.DialogErrorUiState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

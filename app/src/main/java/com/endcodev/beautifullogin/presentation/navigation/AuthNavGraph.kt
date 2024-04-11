@@ -33,6 +33,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
             val uiState by viewModel.uiState.collectAsState()
             val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+
             if (isLoggedIn) {
                 navController.popBackStack() // clear nav history
                 navController.navigate(RootGraph.HOME)

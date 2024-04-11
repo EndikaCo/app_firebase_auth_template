@@ -1,5 +1,7 @@
 package com.endcodev.beautifullogin.domain
 
+import android.util.Log
+
 object App {
     val tag: String
         get() {
@@ -12,4 +14,7 @@ object App {
             }
             return tag
         }
+
+    fun logV(message: String) {
+        Log.v(tag, message)}
 }

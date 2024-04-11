@@ -3,7 +3,7 @@ package com.endcodev.beautifullogin.presentation.utils
 import android.app.AlertDialog
 import android.content.Context
 import com.endcodev.beautifullogin.data.AuthMessage
-import com.endcodev.beautifullogin.domain.DialogErrorUiState
+import com.endcodev.beautifullogin.domain.model.DialogErrorUiState
 
 fun getError(errorNum: Int): DialogErrorUiState {
 

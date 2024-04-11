@@ -1,7 +1,10 @@
 package com.endcodev.beautifullogin.data
 
+import com.endcodev.beautifullogin.domain.App.logV
+import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -69,5 +72,42 @@ class FirebaseAuth : KoinComponent {
 
     fun disconnectUser() {
         Firebase.auth.signOut()
+    }
+
+    fun deleteAccount() {
+        Firebase.auth.currentUser?.delete()
+    }
+
+    fun changeEmail(newEmail: String) {
+        logV("changeEmail")
+        val user = Firebase.auth.currentUser
+        logV("user ${user?.displayName} ")
+        logV("new $newEmail ")
+
+        user?.verifyBeforeUpdateEmail(newEmail)?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Email update is successful
+                logV("Email update successful")
+            } else {
+                // Email update failed
+                logV("Email update failed")
+            }
+        }
+    }
+
+    fun changeUserName(newUser: String) {
+
+        val user = Firebase.auth.currentUser
+
+        val profileUpdates = userProfileChangeRequest {
+            displayName = newUser
+        }
+
+        user?.updateProfile(profileUpdates)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    logV("User profile updated.")
+                }
+            }
     }
 }

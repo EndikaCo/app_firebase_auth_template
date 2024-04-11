@@ -1,4 +1,4 @@
-package com.endcodev.beautifullogin.domain
+package com.endcodev.beautifullogin.domain.model
 
 data class AuthUiState(
     val email: String = "",

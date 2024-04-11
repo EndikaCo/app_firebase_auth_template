@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
-import com.endcodev.beautifullogin.domain.HomeUiState
+import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +73,7 @@ fun TopBarActions(onClick: () -> Unit, state: HomeUiState) {
         horizontalArrangement = Arrangement.End,
         ) {
         Text(
-            text = "${state.auth?.currentUser?.email}\n${state.auth?.currentUser?.displayName}",
+            text = "${state.email}\n${state.userName}",
             textAlign = TextAlign.End
         )
         Spacer(modifier = Modifier.width(10.dp)) // Espacio entre el texto y el ícono
@@ -85,7 +85,7 @@ fun TopBarActions(onClick: () -> Unit, state: HomeUiState) {
                 .padding(2.dp)
                 .clickable { onClick() }
         ) {
-            OpenAccount(state.auth?.currentUser?.photoUrl)
+            OpenAccount(state.image)
         }
     }
 }
