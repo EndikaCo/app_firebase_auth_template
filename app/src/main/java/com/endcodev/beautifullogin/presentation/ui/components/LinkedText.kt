@@ -20,6 +20,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -92,4 +93,10 @@ fun OpenFirebasePolicy() {
     val openURL = Intent(Intent.ACTION_VIEW)
     openURL.data = Uri.parse("https://firebase.google.com/terms")
     context.startActivity(openURL)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LinkedTextPreview() {
+    LinkedText(onCheck = {}, checkedState = false)
 }

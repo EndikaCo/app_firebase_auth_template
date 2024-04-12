@@ -4,9 +4,13 @@ import androidx.lifecycle.ViewModel
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
 import com.endcodev.beautifullogin.domain.model.HomeUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -36,15 +40,31 @@ class HomeViewModel : ViewModel(), KoinComponent {
         _state.update { it.copy(userName = name) }
     }
 
-    fun disconnectUser() {
+    fun disconnectUser() { //landa
         auth.disconnectUser()
     }
 
-    fun deleteAccount() {
+    fun deleteAccount() { // landa
         auth.deleteAccount()
     }
 
-    fun saveNewInfo(){
+    fun saveNewInfo(){ //landa
         auth.changeUserName(_state.value.userName)
+    }
+
+    fun changeEditMode() { //todo landa to check
+        _state.update { it.copy(editMode = !it.editMode) }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val currentUser = client.auth.currentUser
+            currentUser?.reload()?.await()
+
+            if (currentUser != null) {
+                _state.update { it.copy(
+                    userName = currentUser.displayName?: "no name",
+                    email = currentUser.email?: "no mail",
+                ) }
+            }
+        }
     }
 }

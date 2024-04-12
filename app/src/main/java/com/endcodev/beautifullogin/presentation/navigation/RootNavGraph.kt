@@ -10,6 +10,12 @@ import androidx.navigation.compose.rememberNavController
 import com.endcodev.beautifullogin.presentation.ui.components.MovingBackground
 import com.endcodev.beautifullogin.presentation.ui.components.initPlayer
 
+object RootGraph {
+    const val ROOT = "ROOT"
+    const val AUTH = "AUTH"
+    const val HOME = "HOME"
+}
+
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun RootNavGraph() {
@@ -29,15 +35,3 @@ fun RootNavGraph() {
         homeNavGraph(navController = navController)
     }
 }
-
-sealed class HomeGraph {
-    data object START : AuthGraph(route = "START")
-    data object PROFILE : AuthGraph(route = "PROFILE")
-}
-
-object RootGraph {
-    const val ROOT = "ROOT"
-    const val AUTH = "AUTH"
-    const val HOME = "HOME"
-}
-

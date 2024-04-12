@@ -1,5 +1,7 @@
 package com.endcodev.beautifullogin.presentation.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,11 +37,11 @@ fun EmailTextField(email: String, error: String?, onTextChanged: (String) -> Uni
             .alpha(0.9f),
         placeholder = {
             Text(
-                stringResource(R.string.enter_mail),
+                text = stringResource(R.string.enter_mail),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 31.dp)
-                ,textAlign = TextAlign.Center
+                    .padding(end = 31.dp),
+                textAlign = TextAlign.Center
             )
         },
         leadingIcon = {
@@ -58,18 +60,19 @@ fun EmailTextField(email: String, error: String?, onTextChanged: (String) -> Uni
             disabledIndicatorColor = Color.Transparent
         ),
         supportingText = {
-            if (error != null)
-                Text(text = error, color = Color.Red, modifier = Modifier.padding(bottom = 8.dp))
-        }
-    )
+            if (error != null) Text(
+                text = error,
+                color = Color.Red,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        })
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun EmailTextFieldPreview() {
     BeautifulLoginTheme {
-        EmailTextField(
-            email = stringResource(R.string.enter_mail),
+        EmailTextField(email = stringResource(R.string.enter_mail),
             error = "error",
             onTextChanged = {})
     }

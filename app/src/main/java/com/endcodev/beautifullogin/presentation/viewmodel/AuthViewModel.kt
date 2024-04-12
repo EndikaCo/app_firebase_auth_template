@@ -77,7 +77,6 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 }
             }
         }
-        //binding.progress.visibility = View.GONE
     }
 
     private fun gLogin(account: GoogleSignInAccount) {

@@ -42,7 +42,7 @@ fun TopGradient() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun TopGradientPreview() {
     BeautifulLoginTheme {

@@ -2,11 +2,9 @@ package com.endcodev.beautifullogin.presentation.navigation
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -16,6 +14,11 @@ import com.endcodev.beautifullogin.presentation.ui.screens.HomeScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.ProfileScreen
 import com.endcodev.beautifullogin.presentation.viewmodel.HomeViewModel
 import kotlin.system.exitProcess
+
+sealed class HomeGraph {
+    data object START : AuthGraph(route = "START")
+    data object PROFILE : AuthGraph(route = "PROFILE")
+}
 
 fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
     navigation(
@@ -48,7 +51,8 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
                 onSaveButton = {viewModel.saveNewInfo() }, //todo
                 goBackClick = { navController.popBackStack() },
                 onMailChanged = { viewModel.changeMail(it) },
-                onNameChanged = { viewModel.changeUserName(it) }
+                onNameChanged = { viewModel.changeUserName(it) },
+                onEditModeClick = { viewModel.changeEditMode() }
             )
         }
     }

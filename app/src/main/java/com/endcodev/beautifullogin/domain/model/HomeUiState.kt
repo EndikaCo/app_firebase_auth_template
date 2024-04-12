@@ -9,4 +9,6 @@ data class HomeUiState(
     val email: String = "no mail",
     val userName: String = "no name",
     val editMode: Boolean = false,
+    val phone: String = "no phone",
+    val country : String = "unknown",
 )

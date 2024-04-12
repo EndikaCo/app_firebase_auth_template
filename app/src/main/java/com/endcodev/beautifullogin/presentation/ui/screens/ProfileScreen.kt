@@ -21,9 +21,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,24 +41,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.endcodev.beautifullogin.domain.model.HomeUiState
+import com.endcodev.beautifullogin.presentation.ui.components.IconButton
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
+import com.endcodev.beautifullogin.presentation.ui.theme.Orange2
+import com.endcodev.beautifullogin.presentation.ui.theme.Orange3
 
 @Composable
 fun ProfileScreen(
     state: HomeUiState,
+
     onLogOutClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onSaveButton: () -> Unit,
     goBackClick: () -> Unit,
+    onEditModeClick: () -> Unit,
     onMailChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
 ) {
-
-    var editMode by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -74,7 +83,7 @@ fun ProfileScreen(
                     modifier = Modifier
                         .border(1.dp, Color.White, RoundedCornerShape(5.dp))
                         .padding(5.dp)
-                        .clickable { editMode = true },
+                        .clickable { onEditModeClick() },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -91,11 +100,13 @@ fun ProfileScreen(
                 state,
                 onLogOutClick,
                 onDeleteClick,
-                editMode,
-                onSaveButton,
-                {
-                    editMode = false
-                    //todo
+                state.editMode,
+                onSaveButton = {
+                    onEditModeClick()
+                    onSaveButton()
+                },
+                onCancelButton = {
+                    onEditModeClick()
                 },
                 onMailChanged,
                 onNameChanged
@@ -161,21 +172,39 @@ fun ProfileContent(
                 }
             }
 
+            Spacer(modifier = Modifier.height(10.dp))
             MyTextView(state.email, onMailChanged, editMode)
+            Spacer(modifier = Modifier.height(10.dp))
             MyTextView(state.userName, onNameChanged, editMode)
+            Spacer(modifier = Modifier.height(10.dp))
+            MyTextView(state.phone, {/*todo*/}, editMode)
+            Spacer(modifier = Modifier.height(10.dp))
+            MyTextView(state.country, {/*todo*/}, editMode)
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (editMode) {
-                Button(onClick = { onSaveButton() }, modifier = Modifier.width(200.dp)) {
-                    Text(text = "Save")
-                }
-                Button(onClick = { onCancelButton() }, modifier = Modifier.width(200.dp)) {
-                    Text(text = "Cancel")
-                }
+                IconButton(
+                    onButtonClick = { onCancelButton() },
+                    icon = Icons.Default.Cancel,
+                    text = "CANCEL",
+                    null
+                )
+                IconButton(
+                    onButtonClick = { onSaveButton() },
+                    icon = Icons.Default.Save,
+                    text = "SAVE",
+                    Orange2
+                )
+
             } else {
                 Button(onClick = { onLogOutClick() }, modifier = Modifier.width(200.dp)) {
                     Text(text = "LOG OUT")
                 }
-                Button(onClick = { onDeleteClick() }, modifier = Modifier.width(200.dp)) {
+                Button(
+                    onClick = { onDeleteClick() },
+                    modifier = Modifier.width(200.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Orange2)
+                ) {
                     Text(text = "Delete Account")
                 }
             }
@@ -192,9 +221,9 @@ fun MyTextView(
 ) {
     val mod: Modifier = if (editMode)
         Modifier
-            .width(250.dp)
             .clip(RoundedCornerShape(5.dp))
             .border(1.dp, Color.White, RoundedCornerShape(5.dp))
+            .padding(5.dp)
     else
         Modifier
 
@@ -202,18 +231,21 @@ fun MyTextView(
         value = value,
         onValueChange = { onValueChange(it) },
         readOnly = !editMode,
-        cursorBrush = SolidColor(Color.Yellow)
-
-    ) {
-        Box(
-            modifier = mod,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = value, Modifier.padding(5.dp))
+        cursorBrush = SolidColor(Color.Yellow),
+        textStyle = TextStyle(
+            color = Color.White,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+        ),
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = mod,
+                contentAlignment = Alignment.Center
+            ) {
+                innerTextField.invoke()
+            }
         }
-    }
-    if (editMode)
-        Spacer(modifier = Modifier.height(10.dp))
+    )
 
 }
 
@@ -221,6 +253,14 @@ fun MyTextView(
 @Composable
 fun ProfileScreenPreview() {
     BeautifulLoginTheme {
-        ProfileScreen(HomeUiState(), {}, {}, {}, {}, {}, {})
+        ProfileScreen(HomeUiState(editMode = false), {}, {}, {}, {}, {}, {}, {})
+    }
+}
+
+@Preview
+@Composable
+fun ProfileScreenPreview2() {
+    BeautifulLoginTheme {
+        ProfileScreen(HomeUiState(editMode = true), {}, {}, {}, {}, {}, {}, {})
     }
 }

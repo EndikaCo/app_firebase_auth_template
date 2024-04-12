@@ -21,6 +21,13 @@ import com.endcodev.beautifullogin.presentation.utils.sharedViewModel
 import com.endcodev.beautifullogin.presentation.utils.showDialog
 import com.endcodev.beautifullogin.presentation.viewmodel.AuthViewModel
 
+sealed class AuthGraph(val route: String) {
+    data object LOGIN : AuthGraph(route = "LOGIN")
+    data object SIGNUP : AuthGraph(route = "SIGN")
+    data object RESET : AuthGraph(route = "RESET")
+    data object WAITING : AuthGraph(route = "WAITING")
+}
+
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
@@ -118,11 +125,4 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
             WaitingScreen(uiState)
         }
     }
-}
-
-sealed class AuthGraph(val route: String) {
-    data object LOGIN : AuthGraph(route = "LOGIN")
-    data object SIGNUP : AuthGraph(route = "SIGN")
-    data object RESET : AuthGraph(route = "RESET")
-    data object WAITING : AuthGraph(route = "WAITING")
 }
