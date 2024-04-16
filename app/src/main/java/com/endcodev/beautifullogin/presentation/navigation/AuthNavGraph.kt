@@ -11,14 +11,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.endcodev.beautifullogin.data.AuthMessage
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.OK
 import com.endcodev.beautifullogin.presentation.ui.screens.MailLoginScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.ResetPasswordScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.SignUpScreen
 import com.endcodev.beautifullogin.presentation.ui.screens.WaitingScreen
-import com.endcodev.beautifullogin.presentation.utils.getError
 import com.endcodev.beautifullogin.presentation.utils.sharedViewModel
-import com.endcodev.beautifullogin.presentation.utils.showDialog
 import com.endcodev.beautifullogin.presentation.viewmodel.AuthViewModel
 
 sealed class AuthGraph(val route: String) {
@@ -40,6 +38,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
             val uiState by viewModel.uiState.collectAsState()
             val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+            val context = LocalContext.current
 
             if (isLoggedIn) {
                 navController.popBackStack() // clear nav history
@@ -50,27 +49,17 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 contract = ActivityResultContracts.StartActivityForResult(),
                 onResult = { result -> viewModel.gLoginInit(result) }
             )
-            val context = LocalContext.current
 
             MailLoginScreen(
                 uiState = uiState,
-                onAuthClick = {
-                    viewModel.mailPassLogin(onResult = { error ->
-                        if (error != AuthMessage.OK.error) {
-                            val err = getError(error)
-                            showDialog(
-                                context,
-                                err.title,
-                                err.message
-                            )
-                        }
-                    })
-                },
+                onAuthClick = { viewModel.mailPassLogin()},
                 onSignUpClick = { navController.navigate(AuthGraph.SIGNUP.route) },
                 onResetClick = { navController.navigate(AuthGraph.RESET.route) },
                 onEmailChanged = { email -> viewModel.updateLogin(email, uiState.password) },
                 onPassChanged = { pass -> viewModel.updateLogin(uiState.email, pass) },
-                onGoogleClick = { viewModel.googleLogin(context, launcher) }
+                onGoogleClick = { viewModel.googleLogin(context, launcher) },
+                        errorChannel = viewModel.errorChannel
+
             )
         }
 
@@ -84,16 +73,8 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 uiState,
                 onAuthButtonClick = {
                     viewModel.createUser { error ->
-                        if (error == AuthMessage.OK.error)
+                        if (error == OK)
                             navController.navigate(AuthGraph.WAITING.route)
-                        else {
-                            val err = getError(error)
-                            showDialog(
-                                context,
-                                err.title,
-                                err.message
-                            )
-                        }
                     }
                 },
                 onLogInClick = { navController.navigate(RootGraph.AUTH) },

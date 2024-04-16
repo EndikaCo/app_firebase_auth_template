@@ -1,5 +1,6 @@
 package com.endcodev.beautifullogin.presentation.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,33 +31,37 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.components.IconButton
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 import com.endcodev.beautifullogin.presentation.ui.theme.Orange2
-import com.endcodev.beautifullogin.presentation.ui.theme.Orange3
+import com.endcodev.beautifullogin.presentation.utils.UiText
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun ProfileScreen(
     state: HomeUiState,
-
     onLogOutClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onSaveButton: () -> Unit,
@@ -64,9 +69,23 @@ fun ProfileScreen(
     onEditModeClick: () -> Unit,
     onMailChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
+    errorChannel: Flow<UiText>,
 ) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context : Context = LocalContext.current
+
+    LaunchedEffect(errorChannel) {
+        errorChannel.collect { error ->
+            snackBarHostState.showSnackbar(
+                message = error.asString(context),
+                actionLabel = context.getString(R.string.ok),
+                withDismissAction = false,
+                duration = SnackbarDuration.Indefinite)
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             Row(
                 Modifier
@@ -177,9 +196,9 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(10.dp))
             MyTextView(state.userName, onNameChanged, editMode)
             Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.phone, {/*todo*/}, editMode)
+            MyTextView(state.phone, { /*todo*/ }, editMode)
             Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.country, {/*todo*/}, editMode)
+            MyTextView(state.country, { /*todo*/ }, editMode)
             Spacer(modifier = Modifier.height(10.dp))
 
             if (editMode) {
@@ -246,14 +265,27 @@ fun MyTextView(
             }
         }
     )
-
 }
 
 @Preview
 @Composable
 fun ProfileScreenPreview() {
     BeautifulLoginTheme {
-        ProfileScreen(HomeUiState(editMode = false), {}, {}, {}, {}, {}, {}, {})
+
+        val a = UiText.DynamicString("error")
+        val x: Flow<UiText> = flowOf(a)
+
+        ProfileScreen(
+            HomeUiState(editMode = false),
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            x
+        )
     }
 }
 
@@ -261,6 +293,20 @@ fun ProfileScreenPreview() {
 @Composable
 fun ProfileScreenPreview2() {
     BeautifulLoginTheme {
-        ProfileScreen(HomeUiState(editMode = true), {}, {}, {}, {}, {}, {}, {})
+
+        val a = UiText.DynamicString("error")
+        val x: Flow<UiText> = flowOf(a)
+
+        ProfileScreen(
+            HomeUiState(editMode = true),
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            x
+        )
     }
 }

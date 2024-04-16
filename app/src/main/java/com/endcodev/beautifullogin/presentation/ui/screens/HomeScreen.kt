@@ -1,5 +1,6 @@
 package com.endcodev.beautifullogin.presentation.ui.screens
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,25 +21,52 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
+import com.endcodev.beautifullogin.presentation.utils.UiText
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(state: HomeUiState, onProfileClick: () -> Unit) {
+fun HomeScreen(
+    state: HomeUiState,
+    onProfileClick: () -> Unit,
+    errorChannel: Flow<UiText>
+) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context : Context = LocalContext.current
+
+    LaunchedEffect(errorChannel) {
+        errorChannel.collect { error ->
+            snackBarHostState.showSnackbar(
+                message = error.asString(context),
+                actionLabel = context.getString(R.string.ok),
+                withDismissAction = false,
+                duration = SnackbarDuration.Indefinite)
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = { },
@@ -54,7 +82,7 @@ fun HomeScreen(state: HomeUiState, onProfileClick: () -> Unit) {
 }
 
 @Composable
-fun HomeContent(innerPadding: PaddingValues,) {
+fun HomeContent(innerPadding: PaddingValues) {
     Box(
         modifier = Modifier
             .padding(innerPadding)
@@ -71,7 +99,7 @@ fun TopBarActions(onClick: () -> Unit, state: HomeUiState) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End,
-        ) {
+    ) {
         Text(
             text = "${state.email}\n${state.userName}",
             textAlign = TextAlign.End
@@ -115,7 +143,10 @@ fun OpenAccount(photoUrl: Uri?) {
 @Preview
 @Composable
 fun HomePreview() {
+    val a = UiText.DynamicString("error")
+    val x: Flow<UiText> = flowOf(a)
+
     BeautifulLoginTheme {
-        HomeScreen(HomeUiState(), {})
+        HomeScreen(state = HomeUiState(), onProfileClick = {}, errorChannel = x)
     }
 }

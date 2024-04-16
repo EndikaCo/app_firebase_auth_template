@@ -1,13 +1,19 @@
 package com.endcodev.beautifullogin.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
 import com.endcodev.beautifullogin.domain.model.HomeUiState
+import com.endcodev.beautifullogin.presentation.utils.UiText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -19,6 +25,15 @@ class HomeViewModel : ViewModel(), KoinComponent {
     private val auth: FirebaseAuth by inject()
     private val _state = MutableStateFlow(HomeUiState())
     val state = _state.asStateFlow()
+
+    private val _errorChannel = Channel<UiText>()
+    val errorChannel = _errorChannel.receiveAsFlow()
+
+    private fun triggerAlert(error: UiText.StringResource) {
+        viewModelScope.launch {
+            _errorChannel.send(error)
+        }
+    }
 
     init {
         val client = client.auth.currentUser
@@ -36,15 +51,20 @@ class HomeViewModel : ViewModel(), KoinComponent {
     }
 
     fun changeUserName(name: String) {
-        //todo
         _state.update { it.copy(userName = name) }
     }
 
-    fun disconnectUser() { //landa
-        auth.disconnectUser()
+    fun logOut(onComplete : () -> Unit) {
+        viewModelScope.launch {
+            triggerAlert(UiText.StringResource(resId = R.string.disconnecting))
+            delay(1000)
+            auth.disconnectUser()
+            onComplete()
+        }
     }
 
-    fun deleteAccount() { // landa
+    fun deleteAccount() {
+
         auth.deleteAccount()
     }
 
@@ -54,6 +74,8 @@ class HomeViewModel : ViewModel(), KoinComponent {
 
     fun changeEditMode() { //todo landa to check
         _state.update { it.copy(editMode = !it.editMode) }
+
+        triggerAlert(UiText.StringResource(resId = R.string.user_change))
 
         CoroutineScope(Dispatchers.IO).launch {
             val currentUser = client.auth.currentUser

@@ -18,20 +18,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.endcodev.beautifullogin.R
+
 
 @Composable
 fun LinkedText(onCheck: (Boolean) -> Unit, checkedState: Boolean) {
     val annotatedString = buildAnnotatedString {
-        withStyle(style = SpanStyle(fontSize = 15.sp)) { // Adjust the font size here
+        withStyle(
+            style = SpanStyle(
+                fontSize = 15.sp,
+                fontFamily = FontFamily(Font(resId = R.font.chakrapetch))
+            )
+        ) { // Adjust the font size here
             append("By checking, you agree to the ")
 
             pushStringAnnotation(tag = "policy", annotation = "https://google.com/policy")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(resId = R.font.chakrapetchbold))
+                ),
+
+                ) {
                 append("privacy policy")
             }
             pop()
@@ -40,7 +55,12 @@ fun LinkedText(onCheck: (Boolean) -> Unit, checkedState: Boolean) {
 
             pushStringAnnotation(tag = "terms", annotation = "https://google.com/terms")
 
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(resId = R.font.chakrapetchbold))
+                ),
+            ) {
                 append("terms of use.")
             }
 

@@ -1,22 +1,33 @@
 package com.endcodev.beautifullogin.data
 
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_CREATING_ACCOUNT
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_MAIL_IN_USE
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_MAIL_OR_PASS
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_SENDING_MAIL
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.MAIL_VERIFICATION_ERROR
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.OK
 import com.endcodev.beautifullogin.domain.App.logV
-import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import javax.inject.Singleton
 
-sealed class AuthMessage(val error: Int) {
-    data object OK : AuthMessage(error = 0)
-    data object MailVerificationError : AuthMessage(error = 102)
-    data object ErrorMailOrPass : AuthMessage(error = 103)
-    data object ErrorSendingMail : AuthMessage(error = 104) // Unable to send verification email
-    data object ErrorCreatingAccount : AuthMessage(error = 105) // Unable to send verification email
-    data object ErrorMailInUse : AuthMessage(error = 106) // Email already in use
+class AuthMessage {
+    companion object {
+        const val OK = 0
+        const val MAIL_VERIFICATION_ERROR = 102
+        const val ERROR_MAIL_OR_PASS = 103
+        const val ERROR_SENDING_MAIL = 104
+        const val ERROR_CREATING_ACCOUNT = 105
+        const val ERROR_MAIL_IN_USE = 106
+    }
 }
 
 @Singleton
@@ -29,49 +40,44 @@ class FirebaseAuth : KoinComponent {
         auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { result ->
             if (result.isSuccessful) {
                 sendMailVerification {
-                    if (it == AuthMessage.OK.error) {
-                        onCreateUserError(AuthMessage.OK.error)
-                    } else {
-                        onCreateUserError(AuthMessage.ErrorSendingMail.error)
-                    }
+                    if (it == OK)
+                        onCreateUserError(OK)
+                    else
+                        onCreateUserError(ERROR_SENDING_MAIL)
                 }
             } else {
-                if (result.exception is FirebaseAuthUserCollisionException) {
-                    onCreateUserError(AuthMessage.ErrorMailInUse.error)
-                } else {
-                    onCreateUserError(AuthMessage.ErrorCreatingAccount.error)
-                }
+                if (result.exception is FirebaseAuthUserCollisionException)
+                    onCreateUserError(ERROR_MAIL_IN_USE)
+                else
+                    onCreateUserError(ERROR_CREATING_ACCOUNT)
             }
         }
     }
 
     private fun sendMailVerification(onComplete: (Int) -> Unit) {
-        Firebase.auth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
-            if (it.isSuccessful) {
-                onComplete(AuthMessage.OK.error)
-            } else {
+        firebase.auth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
+            if (it.isSuccessful)
+                onComplete(OK)
+            else
                 onComplete(1)
-            }
         }
     }
 
     fun mailPassLogin(loginMail: String, loginPass: String, completionHandler: (Int) -> Unit) {
-        Firebase.auth.signInWithEmailAndPassword(loginMail, loginPass)
+        firebase.auth.signInWithEmailAndPassword(loginMail, loginPass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    if (!Firebase.auth.currentUser?.isEmailVerified!!) {
-                        completionHandler(AuthMessage.MailVerificationError.error)
-                    } else {
-                        completionHandler(AuthMessage.OK.error)
-                    }
-                } else if (task.isCanceled || task.isComplete) {
-                    completionHandler(AuthMessage.ErrorMailOrPass.error)
-                }
+                    if (!Firebase.auth.currentUser?.isEmailVerified!!)
+                        completionHandler(MAIL_VERIFICATION_ERROR)
+                    else
+                        completionHandler(OK)
+                } else if (task.isCanceled || task.isComplete)
+                    completionHandler(ERROR_MAIL_OR_PASS)
             }
     }
 
     fun disconnectUser() {
-        Firebase.auth.signOut()
+        firebase.auth.signOut()
     }
 
     fun deleteAccount() {

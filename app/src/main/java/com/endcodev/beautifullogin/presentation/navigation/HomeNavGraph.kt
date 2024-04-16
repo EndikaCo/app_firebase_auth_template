@@ -28,9 +28,12 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
         composable(route = HomeGraph.START.route) {
             val viewModel: HomeViewModel = viewModel()
             val uiState by viewModel.state.collectAsState()
-            HomeScreen(state = uiState, onProfileClick = {
-                navController.navigate(HomeGraph.PROFILE.route)
-            })
+
+            HomeScreen(
+                state = uiState,
+                onProfileClick = { navController.navigate(HomeGraph.PROFILE.route) },
+                errorChannel = viewModel.errorChannel
+            )
 
             val activity = (LocalContext.current as? Activity)
             BackHandler(onBack = {
@@ -41,24 +44,25 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
         composable(route = HomeGraph.PROFILE.route) {
             val viewModel: HomeViewModel = viewModel()
             val uiState by viewModel.state.collectAsState()
+
             ProfileScreen(
-                uiState,
+                state = uiState,
                 onLogOutClick = {
-                    viewModel.disconnectUser()
-                    navController.navigate(RootGraph.AUTH)
+                    viewModel.logOut(onComplete = { navController.navigate(RootGraph.AUTH)})
                 },
-                onDeleteClick = {viewModel.deleteAccount()},
-                onSaveButton = {viewModel.saveNewInfo() }, //todo
+                onDeleteClick = { viewModel.deleteAccount() },
+                onSaveButton = { viewModel.saveNewInfo() },
                 goBackClick = { navController.popBackStack() },
                 onMailChanged = { viewModel.changeMail(it) },
                 onNameChanged = { viewModel.changeUserName(it) },
-                onEditModeClick = { viewModel.changeEditMode() }
+                onEditModeClick = { viewModel.changeEditMode() },
+                errorChannel = viewModel.errorChannel
             )
         }
     }
 }
 
-fun exitApp(activity : Activity? = null){
+fun exitApp(activity: Activity? = null) {
     activity?.finish()
     exitProcess(0)
 }

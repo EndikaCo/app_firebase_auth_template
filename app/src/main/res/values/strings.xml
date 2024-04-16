@@ -12,4 +12,12 @@
     <string name="enter_username">Enter username</string>
     <string name="google_login">Google login</string>
     <string name="default_web_client_id">308394830065-r8gb6ctsa5m1otdtkhqvtvkchpcn6gsq.apps.googleusercontent.com</string>
+    <string name="login_success">Login success</string>
+    <string name="login_fail">Login fail</string>
+    <string name="ok">OK</string>
+    <string name="error">Unknown</string>
+    <string name="login_error_mail_pass">Error in mail or pass</string>
+    <string name="login_error_verification">Mail is not verified</string>
+    <string name="disconnecting">Disconnecting</string>
+    <string name="user_change">Username data changed</string>
 </resources>

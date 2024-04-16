@@ -10,5 +10,4 @@ data class AuthUiState(
     val passwordError: String? = null,
     val userNameError: String? = null,
     val isTermsChecked: Boolean = false
-) {
-}
+)

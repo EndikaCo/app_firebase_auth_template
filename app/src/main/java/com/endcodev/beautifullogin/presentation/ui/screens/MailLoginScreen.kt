@@ -1,5 +1,6 @@
 package com.endcodev.beautifullogin.presentation.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,10 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +33,9 @@ import com.endcodev.beautifullogin.presentation.ui.components.RectangleButton
 import com.endcodev.beautifullogin.presentation.ui.components.SocialButton
 import com.endcodev.beautifullogin.presentation.ui.components.TopGradient
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
+import com.endcodev.beautifullogin.presentation.utils.UiText
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun MailLoginScreen(
@@ -35,9 +45,24 @@ fun MailLoginScreen(
     onResetClick: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onPassChanged: (String) -> Unit,
-    onGoogleClick: () -> Unit
+    onGoogleClick: () -> Unit,
+    errorChannel: Flow<UiText>
 ) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context : Context = LocalContext.current
+
+    LaunchedEffect(errorChannel) {
+        errorChannel.collect { error ->
+            snackBarHostState.showSnackbar(
+                    message = error.asString(context),
+                    actionLabel = context.getString(R.string.ok),
+                    withDismissAction = false,
+                    duration = SnackbarDuration.Indefinite)
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = { TopGradient() },
         content = { pad ->
             LoginContent(
@@ -102,6 +127,9 @@ fun LoginContent(
 @Composable
 fun LoginScreenPreview() {
     BeautifulLoginTheme {
+        val a = UiText.DynamicString("error")
+        val x: Flow<UiText> = flowOf(a)
+
         MailLoginScreen(
             AuthUiState(
                 email = "email",
@@ -113,7 +141,8 @@ fun LoginScreenPreview() {
             onResetClick = {},
             onEmailChanged = {},
             onPassChanged = {},
-            onGoogleClick = {}
+            onGoogleClick = {},
+            errorChannel = x
         )
     }
 }
