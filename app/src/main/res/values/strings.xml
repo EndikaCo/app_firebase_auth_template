@@ -4,13 +4,8 @@
     <string name="enter_mail">Enter Email</string>
     <string name="password_visibility_off">change password visibility field to visible</string>
     <string name="password_visibility_on">change password visibility field to invisible</string>
-    <string name="password">Enter password</string>
-    <string name="login_google">Login with google</string>
-    <string name="app_logo">app logo</string>
     <string name="enter_pass">Enter password</string>
-    <string name="repeat_pass">Repeat password</string>
     <string name="enter_username">Enter username</string>
-    <string name="google_login">Google login</string>
     <string name="default_web_client_id">308394830065-r8gb6ctsa5m1otdtkhqvtvkchpcn6gsq.apps.googleusercontent.com</string>
     <string name="login_success">Login success</string>
     <string name="login_fail">Login fail</string>
@@ -19,5 +14,19 @@
     <string name="login_error_mail_pass">Error in mail or pass</string>
     <string name="login_error_verification">Mail is not verified</string>
     <string name="disconnecting">Disconnecting</string>
-    <string name="user_change">Username data changed</string>
+    <string name="user_data_change">User data changed</string>
+    <string name="error_data_change">Error occurred while saving new data</string>
+    <string name="account_deleted">Account delete successful</string>
+    <string name="error_deleting_account">Error deleting account</string>
+    <string name="google_login_fail">Failed google login</string>
+    <string name="error_sending_mail">Error sending mail</string>
+    <string name="error_mail_in_use">Error mail already in use</string>
+    <string name="error_creating_account">Error creating account</string>
+    <string name="reset_password">Password reset mail sent</string>
+    <string name="reset_error">Error occurred sending reset mail</string>
+    <string name="log_in">Log In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="check_spam">A link to reset your password will be sent. Please check your spam folder.</string>
+    <string name="reset">RESET</string>
+    <string name="sign_up_capital">SIGN UP</string>
 </resources>

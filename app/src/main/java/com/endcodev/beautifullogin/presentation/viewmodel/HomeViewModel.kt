@@ -41,20 +41,21 @@ class HomeViewModel : ViewModel(), KoinComponent {
             it.copy(
                 email = client?.email ?: "no mail",
                 userName = client?.displayName ?: "no name",
-                image = client?.photoUrl
+                image = client?.photoUrl,
+                phone = client?.phoneNumber?: "no phone",
             )
         }
     }
 
-    fun changeMail(mail: String) {
+    fun onMailChanged(mail: String) {
         _state.update { it.copy(email = mail) }
     }
 
-    fun changeUserName(name: String) {
+    fun onUserNameChanged(name: String) {
         _state.update { it.copy(userName = name) }
     }
 
-    fun logOut(onComplete : () -> Unit) {
+    fun logOut(onComplete: () -> Unit) {
         viewModelScope.launch {
             triggerAlert(UiText.StringResource(resId = R.string.disconnecting))
             delay(1000)
@@ -64,28 +65,41 @@ class HomeViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteAccount() {
-
-        auth.deleteAccount()
+        //todo verify delete with Dialog
+        auth.deleteAccount(onComplete = {
+            if (it == 0)
+                triggerAlert(UiText.StringResource(resId = R.string.account_deleted))
+            else
+                triggerAlert(UiText.StringResource(resId = R.string.error_deleting_account))
+        })
     }
 
-    fun saveNewInfo(){ //landa
-        auth.changeUserName(_state.value.userName)
+    fun saveNewInfo() {
+        auth.changeUserData(
+            newUser = _state.value.userName,
+            onComplete = {
+                if (it == 0)
+                    triggerAlert(UiText.StringResource(resId = R.string.user_data_change))
+                else
+                    triggerAlert(UiText.StringResource(resId = R.string.error_data_change))
+            }
+        )
     }
 
-    fun changeEditMode() { //todo landa to check
+    fun changeEditMode() {
         _state.update { it.copy(editMode = !it.editMode) }
-
-        triggerAlert(UiText.StringResource(resId = R.string.user_change))
 
         CoroutineScope(Dispatchers.IO).launch {
             val currentUser = client.auth.currentUser
             currentUser?.reload()?.await()
 
             if (currentUser != null) {
-                _state.update { it.copy(
-                    userName = currentUser.displayName?: "no name",
-                    email = currentUser.email?: "no mail",
-                ) }
+                _state.update {
+                    it.copy(
+                        userName = currentUser.displayName ?: "no name",
+                        email = currentUser.email ?: "no mail",
+                    )
+                }
             }
         }
     }

@@ -18,6 +18,9 @@
           <timeTargetWasSelectedWithDropDown value="2024-04-16T07:27:59.683518300Z" />
         </State>
       </entry>
+      <entry key="authButtonShouldBeEnabledWhenEmailAndPasswordAreValid()">
+        <State />
+      </entry>
     </value>
   </component>
 </project>

@@ -12,7 +12,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun NotificationDialog(title: String, message: String, onAccept: () -> Unit) {
+fun NotificationDialog(
+    title: String,
+    message: String,
+    onAccept: () -> Unit,
+    onCancel: () -> Unit
+) {
     var showDialog by remember { mutableStateOf(true) }
 
     if (showDialog) {
@@ -30,6 +35,14 @@ fun NotificationDialog(title: String, message: String, onAccept: () -> Unit) {
                 }) {
                     Text("CONTINUE")
                 }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showDialog = false
+                    onCancel()
+                }) {
+                    Text("CANCEL")
+                }
             }
         )
     }
@@ -38,5 +51,5 @@ fun NotificationDialog(title: String, message: String, onAccept: () -> Unit) {
 @Composable
 @Preview
 fun NotificationDialogPreview() {
-    NotificationDialog("Title", "Message", {})
+    NotificationDialog("Title", "Message", {}, {})
 }

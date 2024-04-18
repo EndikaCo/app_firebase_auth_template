@@ -5,28 +5,33 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.endcodev.beautifullogin.R
-import com.endcodev.beautifullogin.data.AuthMessage
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_CREATING_ACCOUNT
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_MAIL_IN_USE
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_MAIL_OR_PASS
+import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_SENDING_MAIL
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.MAIL_VERIFICATION_ERROR
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.OK
 import com.endcodev.beautifullogin.data.FirebaseAuth
 import com.endcodev.beautifullogin.data.FirebaseClient
-import com.endcodev.beautifullogin.domain.App
 import com.endcodev.beautifullogin.domain.model.AuthUiState
 import com.endcodev.beautifullogin.presentation.utils.UiText
+import com.endcodev.beautifullogin.presentation.utils.ValidationUtil.enableLogin
+import com.endcodev.beautifullogin.presentation.utils.ValidationUtil.enableSignUp
+import com.endcodev.beautifullogin.presentation.utils.ValidationUtil.isMailValid
+import com.endcodev.beautifullogin.presentation.utils.ValidationUtil.isNameValid
+import com.endcodev.beautifullogin.presentation.utils.ValidationUtil.isPassValid
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,11 +43,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class AuthViewModel : ViewModel(), KoinComponent {
-
-    companion object {
-        const val MIN_PASS_LENGTH = 6
-        const val MIN_NAME_LENGTH = 3
-    }
 
     private val auth: FirebaseAuth by inject()
     private val client: FirebaseClient by inject()
@@ -63,50 +63,43 @@ class AuthViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    init {
-        enableLogin(uiState.value.email, uiState.value.password)
-        updateLoginState()
-    }
+    private val authStateListener =
+        com.google.firebase.auth.FirebaseAuth.AuthStateListener { firebaseAuth ->
+            _isLoggedIn.value = firebaseAuth.currentUser?.isEmailVerified == true
+        }
 
-    private fun updateLoginState() {
-        val mClient = client.auth.currentUser
-        _isLoggedIn.value = mClient?.isEmailVerified == true
+    init {
+        client.auth.addAuthStateListener(authStateListener)
     }
 
     fun gLoginInit(result: ActivityResult?) {
 
         _uiState.update { it.copy(isLoading = true) }
 
-        if (result != null) {
+        if (result != null && result.resultCode == Activity.RESULT_OK) {
 
-            if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                if (account != null) {
+                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                    client.auth.signInWithCredential(credential)
+                        .addOnCompleteListener { it ->
+                            if (it.isSuccessful)
+                                triggerAlert(UiText.StringResource(resId = R.string.login_success))
+                            else
+                                triggerAlert(UiText.StringResource(resId = R.string.login_fail))
 
-                try {
-                    val account = task.getResult(ApiException::class.java)
-                    if (account != null)
-                        gLogin(account)
-                } catch (e: ApiException) {
-                    Log.e(App.tag, "gLoginInit: error")
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
                 }
-            }
-        }
-    }
-
-    private fun gLogin(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful)
-                    triggerAlert(UiText.StringResource(resId = R.string.login_success))
-                else
-                    triggerAlert(UiText.StringResource(resId = R.string.login_fail))
-
+            } catch (e: ApiException) {
+                triggerAlert(UiText.StringResource(resId = R.string.google_login_fail))
                 _uiState.update { it.copy(isLoading = false) }
-                updateLoginState()
             }
+        } else
+            _uiState.update { it.copy(isLoading = false) }
     }
 
     fun googleLogin(
@@ -124,27 +117,45 @@ class AuthViewModel : ViewModel(), KoinComponent {
     }
 
     fun mailPassLogin() {
+
+        _uiState.update { it.copy(isLoading = true) }
+
         auth.mailPassLogin(
             loginMail = uiState.value.email,
             loginPass = uiState.value.password,
             completionHandler = { error ->
+
                 val message = when (error) {
                     OK -> R.string.login_success
                     MAIL_VERIFICATION_ERROR -> R.string.login_error_verification
                     ERROR_MAIL_OR_PASS -> R.string.login_error_mail_pass
                     else -> R.string.error
                 }
-                triggerAlert(UiText.StringResource(resId = message))
-                updateLoginState()
+
+                viewModelScope.launch {
+                    delay(1000)
+                    triggerAlert(UiText.StringResource(resId = message))
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         )
     }
 
     fun createUser(error: (Int) -> Unit) {
+        _uiState.update { it.copy(isLoading = true) }
+
         auth.createUser(
             email = uiState.value.email,
             pass = uiState.value.password,
-            onCreateUserError = { error(it) }
+            onCreateUserError = { ret ->
+                when (ret) {
+                    OK -> error(ret)
+                    ERROR_SENDING_MAIL -> triggerAlert(UiText.StringResource(resId = R.string.error_sending_mail))
+                    ERROR_MAIL_IN_USE -> triggerAlert(UiText.StringResource(resId = R.string.error_mail_in_use))
+                    ERROR_CREATING_ACCOUNT -> triggerAlert(UiText.StringResource(resId = R.string.error_creating_account))
+                }
+                _uiState.update { it.copy(isLoading = false) }
+            }
         )
     }
 
@@ -216,20 +227,33 @@ class AuthViewModel : ViewModel(), KoinComponent {
         handler.post(runnableCode)
     }
 
-    private fun enableSignUp(
-        email: String,
-        password: String,
-        userName: String,
-        terms: Boolean
-    ): Boolean = isMailValid(email)
-            && isPassValid(password)
-            && isNameValid(userName)
-            && terms
+    override fun onCleared() {
+        super.onCleared()
+        client.auth.removeAuthStateListener(authStateListener)
+    }
 
-    private fun enableLogin(email: String, password: String) =
-        isMailValid(email) && isPassValid(password)
+    fun resetPassword(mail: String, listenerUnit: () -> Unit) {
+        _uiState.update { it.copy(isLoading = true) }
 
-    private fun isMailValid(email: String) = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    private fun isPassValid(pass: String) = pass.length > MIN_PASS_LENGTH
-    private fun isNameValid(name: String) = name.length > MIN_NAME_LENGTH
+
+        auth.resetPassword(email = mail, onComplete = { error ->
+
+            viewModelScope.launch {
+
+                if (error == OK) {
+                    triggerAlert(UiText.StringResource(resId = R.string.reset_password))
+                    delay(1000)
+                    listenerUnit()
+                    _uiState.update { it.copy(isLoading = false) }
+                } else {
+                    triggerAlert(UiText.StringResource(resId = R.string.reset_error))
+                    delay(1000)
+                    listenerUnit()
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+            }
+        })
+
+
+    }
 }

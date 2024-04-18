@@ -44,9 +44,8 @@ fun LinkedText(onCheck: (Boolean) -> Unit, checkedState: Boolean) {
                 style = SpanStyle(
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily(Font(resId = R.font.chakrapetchbold))
-                ),
-
-                ) {
+                )
+            ) {
                 append("privacy policy")
             }
             pop()
@@ -63,7 +62,6 @@ fun LinkedText(onCheck: (Boolean) -> Unit, checkedState: Boolean) {
             ) {
                 append("terms of use.")
             }
-
             pop()
         }
     }
@@ -105,7 +103,6 @@ fun LinkedText(onCheck: (Boolean) -> Unit, checkedState: Boolean) {
 
     }
 }
-
 
 @Composable
 fun OpenFirebasePolicy() {

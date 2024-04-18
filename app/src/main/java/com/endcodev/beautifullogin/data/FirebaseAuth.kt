@@ -6,15 +6,10 @@ import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_MAIL_OR_PASS
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.ERROR_SENDING_MAIL
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.MAIL_VERIFICATION_ERROR
 import com.endcodev.beautifullogin.data.AuthMessage.Companion.OK
-import com.endcodev.beautifullogin.domain.App.logV
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import javax.inject.Singleton
@@ -80,31 +75,29 @@ class FirebaseAuth : KoinComponent {
         firebase.auth.signOut()
     }
 
-    fun deleteAccount() {
-        Firebase.auth.currentUser?.delete()
-    }
-
-    fun changeEmail(newEmail: String) {
-        logV("changeEmail")
-        val user = Firebase.auth.currentUser
-        logV("user ${user?.displayName} ")
-        logV("new $newEmail ")
-
-        user?.verifyBeforeUpdateEmail(newEmail)?.addOnCompleteListener { task ->
+    fun deleteAccount(onComplete: (Int) -> Unit) {
+        firebase.auth.currentUser?.delete()?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Email update is successful
-                logV("Email update successful")
+                onComplete(0)
             } else {
-                // Email update failed
-                logV("Email update failed")
+                onComplete(1)
             }
         }
     }
 
-    fun changeUserName(newUser: String) {
+    fun resetPassword(email: String, onComplete: (Int) -> Unit) {
+        firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onComplete(0)
+            } else {
+                onComplete(1)
+            }
+        }
+    }
 
-        val user = Firebase.auth.currentUser
+    fun changeUserData(newUser: String, onComplete: (Int) -> Unit) {
 
+        val user = firebase.auth.currentUser
         val profileUpdates = userProfileChangeRequest {
             displayName = newUser
         }
@@ -112,7 +105,9 @@ class FirebaseAuth : KoinComponent {
         user?.updateProfile(profileUpdates)
             ?.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    logV("User profile updated.")
+                    onComplete(0)
+                } else {
+                    onComplete(1)
                 }
             }
     }

@@ -36,7 +36,6 @@ fun UserNameTextField(email: String, error: String?, onTextChanged: (String) -> 
                 modifier = Modifier
                     .fillMaxWidth()
                     .alpha(0.9f)
-
                     .padding(end = 31.dp), textAlign = TextAlign.Center
             )
         },

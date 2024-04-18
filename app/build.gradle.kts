@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.runtime.compose)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.v412)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -76,30 +77,31 @@ dependencies {
     implementation(libs.koin.android)
 
     // firebase
-    implementation("com.google.firebase:firebase-database:20.3.1")
+    implementation(libs.firebase.database)
 
     // lifecycle viewModel compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     //firebase
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation("com.google.firebase:firebase-common-ktx:20.4.2")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.common.ktx)
+    implementation(libs.firebase.database.ktx)
 
     //exoplayer video
-    implementation("androidx.media3:media3-exoplayer:1.3.0")
-    implementation("androidx.media3:media3-exoplayer-dash:1.3.0")
-    implementation("androidx.media3:media3-ui:1.3.0")
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
 
     //navigation
-    implementation("androidx.navigation:navigation-runtime-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    androidTestImplementation (libs.androidx.navigation.testing)
 
     //extended icons
-    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+    implementation(libs.androidx.material.icons.extended)
 
     //coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation(libs.coil.compose)
 
     // login with google button
     implementation(libs.play.services.auth)

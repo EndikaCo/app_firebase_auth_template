@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
@@ -49,7 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.components.IconButton
@@ -98,18 +97,6 @@ fun ProfileScreen(
                     modifier = Modifier.clickable { goBackClick() },
                     contentDescription = "Back Arrow"
                 )
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, Color.White, RoundedCornerShape(5.dp))
-                        .padding(5.dp)
-                        .clickable { onEditModeClick() },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Save Data", Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Text(text = "Edit Info")
-                }
             }
         },
         bottomBar = {},
@@ -128,7 +115,8 @@ fun ProfileScreen(
                     onEditModeClick()
                 },
                 onMailChanged,
-                onNameChanged
+                onNameChanged,
+                onEditModeClick,
             )
         }
     )
@@ -145,6 +133,7 @@ fun ProfileContent(
     onCancelButton: () -> Unit,
     onMailChanged: (String) -> Unit,
     onNameChanged: (String) -> Unit,
+    onEditModeClick: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
@@ -154,7 +143,7 @@ fun ProfileContent(
         ) {
             state.image.let { url ->
                 if (url != null) {
-                    val painter = rememberImagePainter(data = url)
+                    val painter = rememberAsyncImagePainter(model = url)
                     Box(
                         modifier = Modifier
                             .padding(10.dp) //padding to the end
@@ -196,9 +185,7 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(10.dp))
             MyTextView(state.userName, onNameChanged, editMode)
             Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.phone, { /*todo*/ }, editMode)
-            Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.country, { /*todo*/ }, editMode)
+            MyTextView(state.phone, {  }, editMode)
             Spacer(modifier = Modifier.height(10.dp))
 
             if (editMode) {
@@ -216,8 +203,11 @@ fun ProfileContent(
                 )
 
             } else {
+                Button(onClick = { onEditModeClick() }, modifier = Modifier.width(200.dp)) {
+                    Text(text = "Edit")
+                }
                 Button(onClick = { onLogOutClick() }, modifier = Modifier.width(200.dp)) {
-                    Text(text = "LOG OUT")
+                    Text(text = "Log out")
                 }
                 Button(
                     onClick = { onDeleteClick() },
@@ -276,15 +266,15 @@ fun ProfileScreenPreview() {
         val x: Flow<UiText> = flowOf(a)
 
         ProfileScreen(
-            HomeUiState(editMode = false),
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            x
+            state = HomeUiState(editMode = false),
+            onLogOutClick = {},
+            onDeleteClick = {},
+            onSaveButton = {},
+            goBackClick = {},
+            onEditModeClick = {},
+            onMailChanged = {},
+            onNameChanged = {},
+            errorChannel = x,
         )
     }
 }
@@ -298,15 +288,15 @@ fun ProfileScreenPreview2() {
         val x: Flow<UiText> = flowOf(a)
 
         ProfileScreen(
-            HomeUiState(editMode = true),
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            x
+            state = HomeUiState(editMode = true),
+            onLogOutClick = {},
+            onDeleteClick = {},
+            onSaveButton = {},
+            goBackClick = {},
+            onEditModeClick = {},
+            onMailChanged = {},
+            onNameChanged = {},
+            errorChannel = x,
         )
     }
 }

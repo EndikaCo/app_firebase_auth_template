@@ -5,10 +5,6 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 
-
-/**
- * Para pasar strings directamente de resources al viewmodel sin tener leaks
- */
 sealed class UiText {
     data class DynamicString(val value: String): UiText()
     class StringResource(

@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
@@ -53,7 +53,7 @@ fun HomeScreen(
     errorChannel: Flow<UiText>
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
-    val context : Context = LocalContext.current
+    val context: Context = LocalContext.current
 
     LaunchedEffect(errorChannel) {
         errorChannel.collect { error ->
@@ -61,7 +61,8 @@ fun HomeScreen(
                 message = error.asString(context),
                 actionLabel = context.getString(R.string.ok),
                 withDismissAction = false,
-                duration = SnackbarDuration.Indefinite)
+                duration = SnackbarDuration.Indefinite
+            )
         }
     }
 
@@ -127,7 +128,7 @@ fun OpenAccount(photoUrl: Uri?) {
     ) {
         photoUrl?.let {
             Image(
-                painter = rememberImagePainter(data = it),
+                painter = rememberAsyncImagePainter(model = it),
                 contentDescription = "User Photo",
                 modifier = Modifier.size(40.dp)
             )
@@ -147,6 +148,9 @@ fun HomePreview() {
     val x: Flow<UiText> = flowOf(a)
 
     BeautifulLoginTheme {
-        HomeScreen(state = HomeUiState(), onProfileClick = {}, errorChannel = x)
+        HomeScreen(
+            state = HomeUiState(),
+            onProfileClick = {},
+            errorChannel = x)
     }
 }

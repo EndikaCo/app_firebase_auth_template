@@ -1,6 +1,8 @@
 package com.endcodev.beautifullogin.presentation.navigation
 
+import android.app.Activity
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -41,9 +43,12 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
             val context = LocalContext.current
 
             if (isLoggedIn) {
-                navController.popBackStack() // clear nav history
+                navController.popBackStack()
                 navController.navigate(RootGraph.HOME)
             }
+
+            val activity = (LocalContext.current as? Activity)
+            BackHandler(onBack = { exitApp(activity) })
 
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
@@ -52,14 +57,13 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
             MailLoginScreen(
                 uiState = uiState,
-                onAuthClick = { viewModel.mailPassLogin()},
+                onAuthClick = { viewModel.mailPassLogin() },
                 onSignUpClick = { navController.navigate(AuthGraph.SIGNUP.route) },
                 onResetClick = { navController.navigate(AuthGraph.RESET.route) },
                 onEmailChanged = { email -> viewModel.updateLogin(email, uiState.password) },
                 onPassChanged = { pass -> viewModel.updateLogin(uiState.email, pass) },
                 onGoogleClick = { viewModel.googleLogin(context, launcher) },
-                        errorChannel = viewModel.errorChannel
-
+                errorChannel = viewModel.errorChannel
             )
         }
 
@@ -67,7 +71,6 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
 
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
             val uiState by viewModel.uiState.collectAsState()
-            val context = LocalContext.current
 
             SignUpScreen(
                 uiState,
@@ -81,7 +84,8 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 onEmailChanged = { email -> viewModel.updateSignUp(email = email) },
                 onPassChanged = { password -> viewModel.updateSignUp(pass = password) },
                 onUserNameChanged = { userName -> viewModel.updateSignUp(userName = userName) },
-                onCheckedTerms = { terms -> viewModel.updateSignUp(terms = terms) }
+                onCheckedTerms = { terms -> viewModel.updateSignUp(terms = terms) },
+                errorChannel = viewModel.errorChannel
             )
         }
 
@@ -93,13 +97,22 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                 email = uiState.email,
                 isLoginEnabled = uiState.isAuthButtonEnabled,
                 onEmailChanged = { email -> viewModel.updateReset(email) },
-                onAuthClick = { navController.navigate(RootGraph.AUTH) },
+                onAuthClick = {
+                    viewModel.resetPassword(
+                        uiState.email,
+                        listenerUnit = { navController.navigate(RootGraph.AUTH) })
+                },
                 onSignUpClick = { navController.navigate(AuthGraph.SIGNUP.route) },
-                onLogInClick = { navController.navigate(RootGraph.AUTH) }
+                onLogInClick = { navController.navigate(RootGraph.AUTH) },
+                errorChannel = viewModel.errorChannel,
+                isLoading = uiState.isLoading
             )
         }
 
         composable(route = AuthGraph.WAITING.route) {
+
+            BackHandler(onBack = { navController.navigate(RootGraph.AUTH) })
+
             val viewModel = it.sharedViewModel<AuthViewModel>(navController)
             val uiState by viewModel.uiState.collectAsState()
             viewModel.listenerMailVerification { navController.navigate(RootGraph.AUTH) }

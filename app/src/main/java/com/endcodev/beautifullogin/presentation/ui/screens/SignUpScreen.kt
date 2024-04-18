@@ -1,24 +1,27 @@
 package com.endcodev.beautifullogin.presentation.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.endcodev.beautifullogin.R
@@ -32,6 +35,9 @@ import com.endcodev.beautifullogin.presentation.ui.components.RectangleButton
 import com.endcodev.beautifullogin.presentation.ui.components.TopGradient
 import com.endcodev.beautifullogin.presentation.ui.components.UserNameTextField
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
+import com.endcodev.beautifullogin.presentation.utils.UiText
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 
 @Composable
@@ -43,8 +49,24 @@ fun SignUpScreen(
     onPassChanged: (String) -> Unit,
     onUserNameChanged: (String) -> Unit,
     onCheckedTerms: (Boolean) -> Unit,
+    errorChannel: Flow<UiText>,
 ) {
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context: Context = LocalContext.current
+
+    LaunchedEffect(errorChannel) {
+        errorChannel.collect { error ->
+            snackBarHostState.showSnackbar(
+                message = error.asString(context),
+                withDismissAction = true,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = { TopGradient() },
         content = { pad ->
             SignUpContent(
@@ -100,17 +122,27 @@ fun SignUpContent(
         LinkedText(onCheckedTerms, uiState.isTermsChecked)
         Spacer(modifier = Modifier.height(16.dp))
         RectangleButton(
-            text = "SIGN UP",
+            text = stringResource(R.string.sign_up_capital),
             loginEnabled = uiState.isAuthButtonEnabled,
             onAuthButtonClick
         )
     }
+    if (uiState.isLoading)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CircularProgressIndicator()
+        }
 }
 
 @Preview
 @Composable
 fun SignUpScreenPreview() {
     BeautifulLoginTheme {
+        val a = UiText.DynamicString("error")
+        val x: Flow<UiText> = flowOf(a)
+
         SignUpScreen(
             AuthUiState(
                 email = "Email",
@@ -122,7 +154,8 @@ fun SignUpScreenPreview() {
             onEmailChanged = {},
             onPassChanged = {},
             onUserNameChanged = {},
-            onCheckedTerms = {}
+            onCheckedTerms = {},
+            errorChannel = x
         )
     }
 }

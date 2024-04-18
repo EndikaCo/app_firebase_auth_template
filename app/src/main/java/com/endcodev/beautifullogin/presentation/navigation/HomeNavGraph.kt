@@ -48,15 +48,18 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
             ProfileScreen(
                 state = uiState,
                 onLogOutClick = {
-                    viewModel.logOut(onComplete = { navController.navigate(RootGraph.AUTH)})
+                    viewModel.logOut(
+                        onComplete = {
+                            navController.navigate(RootGraph.AUTH)
+                        })
                 },
                 onDeleteClick = { viewModel.deleteAccount() },
                 onSaveButton = { viewModel.saveNewInfo() },
                 goBackClick = { navController.popBackStack() },
-                onMailChanged = { viewModel.changeMail(it) },
-                onNameChanged = { viewModel.changeUserName(it) },
+                onMailChanged = { viewModel.onMailChanged(it) },
+                onNameChanged = { viewModel.onUserNameChanged(it) },
                 onEditModeClick = { viewModel.changeEditMode() },
-                errorChannel = viewModel.errorChannel
+                errorChannel = viewModel.errorChannel,
             )
         }
     }

@@ -1,7 +1,6 @@
 package com.endcodev.beautifullogin.domain.model
 
 import android.net.Uri
-import com.google.firebase.auth.FirebaseAuth
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -10,5 +9,4 @@ data class HomeUiState(
     val userName: String = "no name",
     val editMode: Boolean = false,
     val phone: String = "no phone",
-    val country : String = "unknown",
 )

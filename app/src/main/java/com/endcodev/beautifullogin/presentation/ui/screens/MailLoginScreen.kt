@@ -2,6 +2,7 @@ package com.endcodev.beautifullogin.presentation.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -49,15 +50,15 @@ fun MailLoginScreen(
     errorChannel: Flow<UiText>
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
-    val context : Context = LocalContext.current
+    val context: Context = LocalContext.current
 
     LaunchedEffect(errorChannel) {
         errorChannel.collect { error ->
             snackBarHostState.showSnackbar(
-                    message = error.asString(context),
-                    actionLabel = context.getString(R.string.ok),
-                    withDismissAction = false,
-                    duration = SnackbarDuration.Indefinite)
+                message = error.asString(context),
+                withDismissAction = true,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
@@ -95,8 +96,7 @@ fun LoginContent(
     onPassChanged: (String) -> Unit,
     onGoogleClick: () -> Unit
 ) {
-    if(uiState.isLoading)
-        CircularProgressIndicator()
+
     Column(
         modifier = Modifier
             .padding(pad)
@@ -121,6 +121,14 @@ fun LoginContent(
         Spacer(modifier = Modifier.height(20.dp))
         SocialButton(onClick = { onGoogleClick() })
     }
+
+    if (uiState.isLoading)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CircularProgressIndicator()
+        }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF2D4A64)
