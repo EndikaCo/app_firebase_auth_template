@@ -36,13 +36,16 @@ class HomeViewModel : ViewModel(), KoinComponent {
     }
 
     init {
+        updateUi()
+    }
+
+    private fun updateUi(){
         val client = client.auth.currentUser
         _state.update {
             it.copy(
                 email = client?.email ?: "no mail",
                 userName = client?.displayName ?: "no name",
                 image = client?.photoUrl,
-                phone = client?.phoneNumber?: "no phone",
             )
         }
     }
@@ -74,7 +77,7 @@ class HomeViewModel : ViewModel(), KoinComponent {
         })
     }
 
-    fun saveNewInfo() {
+    fun saveNewInfo()  {
         auth.changeUserData(
             newUser = _state.value.userName,
             onComplete = {
@@ -82,8 +85,10 @@ class HomeViewModel : ViewModel(), KoinComponent {
                     triggerAlert(UiText.StringResource(resId = R.string.user_data_change))
                 else
                     triggerAlert(UiText.StringResource(resId = R.string.error_data_change))
+                updateUi()
             }
         )
+
     }
 
     fun changeEditMode() {

@@ -52,6 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.endcodev.beautifullogin.R
 import com.endcodev.beautifullogin.domain.model.HomeUiState
 import com.endcodev.beautifullogin.presentation.ui.components.IconButton
+import com.endcodev.beautifullogin.presentation.ui.components.MyEditableTextView
 import com.endcodev.beautifullogin.presentation.ui.theme.BeautifulLoginTheme
 import com.endcodev.beautifullogin.presentation.ui.theme.Orange2
 import com.endcodev.beautifullogin.presentation.utils.UiText
@@ -181,11 +182,9 @@ fun ProfileContent(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.email, onMailChanged, editMode)
+            MyTextView(state.email, onMailChanged, false)
             Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.userName, onNameChanged, editMode)
-            Spacer(modifier = Modifier.height(10.dp))
-            MyTextView(state.phone, {  }, editMode)
+            MyEditableTextView(state.userName, onNameChanged, editMode, onEditModeClick)
             Spacer(modifier = Modifier.height(10.dp))
 
             if (editMode) {
@@ -203,9 +202,6 @@ fun ProfileContent(
                 )
 
             } else {
-                Button(onClick = { onEditModeClick() }, modifier = Modifier.width(200.dp)) {
-                    Text(text = "Edit")
-                }
                 Button(onClick = { onLogOutClick() }, modifier = Modifier.width(200.dp)) {
                     Text(text = "Log out")
                 }

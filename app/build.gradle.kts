@@ -105,4 +105,7 @@ dependencies {
 
     // login with google button
     implementation(libs.play.services.auth)
+
+    //splashscreen
+    implementation (libs.androidx.core.splashscreen)
 }

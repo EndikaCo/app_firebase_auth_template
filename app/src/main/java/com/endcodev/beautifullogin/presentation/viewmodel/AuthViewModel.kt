@@ -235,7 +235,6 @@ class AuthViewModel : ViewModel(), KoinComponent {
     fun resetPassword(mail: String, listenerUnit: () -> Unit) {
         _uiState.update { it.copy(isLoading = true) }
 
-
         auth.resetPassword(email = mail, onComplete = { error ->
 
             viewModelScope.launch {
@@ -253,7 +252,5 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 }
             }
         })
-
-
     }
 }

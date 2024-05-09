@@ -14,7 +14,7 @@ import com.endcodev.beautifullogin.R
 
 fun initPlayer(context: Context): ExoPlayer {
     val player = ExoPlayer.Builder(context).build()
-    val uri = Uri.parse("android.resource://${context.packageName}/${R.raw.nubes}")
+    val uri = Uri.parse("android.resource://${context.packageName}/${R.raw.clouds}")
     val mediaItem = MediaItem.fromUri(uri)
     player.setMediaItem(mediaItem)
     player.repeatMode = ExoPlayer.REPEAT_MODE_ALL

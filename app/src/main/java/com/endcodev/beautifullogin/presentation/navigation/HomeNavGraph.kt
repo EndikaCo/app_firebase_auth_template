@@ -55,7 +55,7 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
                 },
                 onDeleteClick = { viewModel.deleteAccount() },
                 onSaveButton = { viewModel.saveNewInfo() },
-                goBackClick = { navController.popBackStack() },
+                goBackClick = { navController.navigate( HomeGraph.START.route) },
                 onMailChanged = { viewModel.onMailChanged(it) },
                 onNameChanged = { viewModel.onUserNameChanged(it) },
                 onEditModeClick = { viewModel.changeEditMode() },

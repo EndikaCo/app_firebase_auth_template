@@ -16,9 +16,9 @@ buildscript {
     dependencies {
 
         //firebase
-        classpath("com.google.gms:google-services:4.4.1")
+        classpath(libs.google.services)
 
         //firebase auth
-        classpath("com.google.gms:google-services:4.4.1")
+        classpath(libs.google.services)
     }
 }
