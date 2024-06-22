@@ -12,6 +12,6 @@ Firebase Authentication Template
 [![Architecture](https://badgen.net/badge/Architecture/MVVM?color=black)]()
 [![Dependency-Injection](https://badgen.net/badge/Dependency-Injection/Koin?color=black)]()
 
-| ![signup](images/signup.gif) |  | ![login](images/login.gif) |
-|------------------------------|--|----------------------------|
+| ![signup](images/signup.gif) | ![login](images/login.gif) |
+|------------------------------|----------------------------|
 
