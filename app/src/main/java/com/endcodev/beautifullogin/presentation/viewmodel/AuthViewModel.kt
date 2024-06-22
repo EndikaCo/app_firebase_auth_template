@@ -98,8 +98,12 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 triggerAlert(UiText.StringResource(resId = R.string.google_login_fail))
                 _uiState.update { it.copy(isLoading = false) }
             }
-        } else
+        } else{
+
             _uiState.update { it.copy(isLoading = false) }
+            triggerAlert(UiText.StringResource(resId = R.string.google_login_fail))
+
+        }
     }
 
     fun googleLogin(
